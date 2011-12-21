@@ -1,0 +1,44 @@
+synsets {
+  offset: 0
+  key: "ROOT"
+  children_offsets: 1
+  children_offsets: 2
+  children_offsets: 3
+  children_offsets: 4
+  hyponym_count: 7
+  hyperparameter: "NL_"
+}
+synsets {
+  offset: 1
+  key: "CL_"
+  children_offsets: 5
+  children_offsets: 6
+  children_offsets: 7
+  hyponym_count: 4
+  hyperparameter: "CL_"
+}
+synsets {
+  offset: 5
+  key: "NL_"
+  children_offsets: 8
+  children_offsets: 9
+  hyponym_count: 1.5
+  hyperparameter: "NL_"
+}
+synsets {
+  offset: 6
+  key: "NL_"
+  children_offsets: 10
+  children_offsets: 11
+  hyponym_count: 1
+  hyperparameter: "NL_"
+}
+synsets {
+  offset: 7
+  key: "NL_"
+  children_offsets: 12
+  children_offsets: 13
+  hyponym_count: 1.5
+  hyperparameter: "NL_"
+}
+root: 0
