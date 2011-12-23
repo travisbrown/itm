@@ -4,6 +4,13 @@ import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntDoubleHashMap;
 
+/**
+ * This class improves the fast sampler based on estimation of smoothing.
+ * Most of the time, the smoothing is very small and not worth to recompute since
+ * it will hardly be hit. So we use an upper bound for smoothing. 
+ * Only if the smoothing bin is hit, the actual smoothing is computed and resampled.
+ * Author: Yuening Hu
+ */
 public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 	
 	public TreeTopicSamplerFastEst (int numberOfTopics, double alphaSum, int seed) {
@@ -11,6 +18,10 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 		this.topics = new TreeTopicModelFastEst(this.numTopics, this.random);
 	}
 	
+	/**
+	 * Use an upper bound for smoothing. Only if the smoothing 
+	 * bin is hit, the actual smoothing is computed and resampled.
+	 */
 	public void sampleDoc(int doc_id) {
 		DocData doc = this.data.get(doc_id);
 		//System.out.println("doc " + doc_id);
@@ -38,6 +49,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 			
 			int[] paths = this.topics.getWordPathIndexSet(word);
 			
+			// sample the smoothing bin
 			if (sample < smoothing_mass_est) {
 				double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 				double norm =  smoothing_mass + topic_beta_mass + topic_term_mass;
@@ -67,6 +79,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 				sample -= smoothing_mass_est;
 			}
 			
+			// sample topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
@@ -88,6 +101,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 				sample -= topic_beta_mass;
 			}
 			
+			// sample topic term bin
 			if (new_topic < 0) {
 				int[] topic_set = topic_term_score.getKey1Set();
 				for (int tt : topic_set) {
@@ -114,6 +128,9 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 		
 	}
 	
+	/**
+	 * Before sampling start, compute smoothing upper bound for each word.
+	 */
 	public void estimate(int numIterations, String outputFolder, int outputInterval, int topWords) {
 		if(this.topics instanceof TreeTopicModelFastEst) {
 			TreeTopicModelFastEst tmp = (TreeTopicModelFastEst) this.topics;

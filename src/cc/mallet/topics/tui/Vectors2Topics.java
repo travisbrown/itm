@@ -17,6 +17,7 @@ import cc.mallet.types.LabelSequence;
 import cc.mallet.topics.*;
 import cc.mallet.topics.tree.GenerateVocab;
 import cc.mallet.topics.tree.PriorTree;
+import cc.mallet.topics.tree.TreeTopicSampler;
 import cc.mallet.topics.tree.TreeTopicSamplerFast;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEst;
 import cc.mallet.topics.tree.TreeTopicSamplerNaive;
@@ -62,6 +63,10 @@ public class Vectors2Topics {
 	(Vectors2Topics.class, "use-tree-lda", "true|false", false, false,
 	 "Rather than using flat prior for LDA, use the tree-based prior for LDA, which models words' correlations." +
 	 "You cannot do this and also --use-ngrams or --use-PAM.", null);
+	
+	static CommandOption.String modelType = new CommandOption.String
+	(Vectors2Topics.class, "tree-model-type", "TYPENAME", true, "fast-est",
+	 "Three possible types: naive, fast, fast-est.", null);
 
 	static CommandOption.String treeFiles = new CommandOption.String
 	(Vectors2Topics.class, "tree", "FILENAME", true, null,
@@ -117,21 +122,36 @@ public class Vectors2Topics {
 			if (genVocab.value) {
 				GenerateVocab.genVocab(ilist, vocabFile.value);
 			} else {
-				TreeTopicSamplerNaive topicModel = new TreeTopicSamplerNaive(numTopics.value, alpha.value, randomSeed.value);
-				//TreeTopicSamplerFast topicModel = new TreeTopicSamplerFast(numTopics.value, alpha.value, randomSeed.value);
-				//TreeTopicSamplerFastEst topicModel = new TreeTopicSamplerFastEst(numTopics.value, alpha.value, randomSeed.value);
+				TreeTopicSampler topicModel = null;
+				if (modelType.value.equals("naive")) {
+					topicModel = new TreeTopicSamplerNaive(
+							numTopics.value, alpha.value, randomSeed.value);
+				} else if (modelType.value.equals("fast")){
+					topicModel = new TreeTopicSamplerFast(
+							numTopics.value, alpha.value, randomSeed.value);
+				} else if (modelType.value.equals("fast-est")) {
+					topicModel = new TreeTopicSamplerFastEst(
+							numTopics.value, alpha.value, randomSeed.value);
+				} else {
+					System.out.println("model type wrong! please use " +
+							"'naive' 'fast' or 'fast-est'!");
+					System.exit(0);
+				}
 				
 				// load tree and vocab
 				topicModel.initialize(treeFiles.value, hyperFile.value, vocabFile.value);
 	            topicModel.setNumIterations(numIterations.value);
 	            
 				if (resume.value == true) {
+					// resume instances from the saved states
 					topicModel.resume(ilist, resumeDir.value);
 				} else {
 					// add instances
 					topicModel.addInstances(ilist);
 				}
 				
+				// if clearType is not null, clear the topic assignments of the 
+				// constraint words
 				if (clearType.value != null) {
 					if (clearType.value.equals("term") || clearType.value.equals("doc")) {
 						topicModel.clearTopicAssignments(clearType.value, consFile.value);
@@ -141,8 +161,11 @@ public class Vectors2Topics {
 					}
 				}
 				
+				// sampling and save states
 				topicModel.estimate(numIterations.value, outputDir.value, 
 									outputInteval.value, topWords.value);
+				
+				// topic report
 				System.out.println(topicModel.displayTopWords(topWords.value));
 			}
 		}		

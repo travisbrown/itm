@@ -12,11 +12,12 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import junit.framework.TestCase;
 
-
+/**
+ * This class tests the naive sampler.
+ * Author: Yuening Hu
+ */
 public class testNaive extends TestCase{
 	
-
-
 	public static TreeTopicSamplerNaive Initialize() {
 		
 		String inputFile = "../input/toy-topic-input.mallet";
@@ -123,8 +124,6 @@ public class testNaive extends TestCase{
 		
 	}
 	
-	
-	
 	public void testComputeTermScore() {
 		TreeTopicSamplerNaive topicModel = this.Initialize();
 		for (int dd = 0; dd < topicModel.data.size(); dd++ ) {
@@ -152,7 +151,5 @@ public class testNaive extends TestCase{
 			}
 		}
 	}
-	
-	
 	
 }

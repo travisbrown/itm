@@ -26,8 +26,17 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import cc.mallet.util.Randoms;
 
+/**
+ * This class defines the tree topic sampler, which loads the instances,  
+ * reports the topics, and leaves the sampler method as an abstract method, 
+ * which might be various for different methods.
+ * Author: Yuening Hu
+ */
 public abstract class TreeTopicSampler {
 	
+	/**
+	 * This class defines the format of a document.
+	 */
 	public class DocData implements Serializable {
 		TIntArrayList tokens;
 		TIntArrayList topics;
@@ -101,8 +110,14 @@ public abstract class TreeTopicSampler {
 		this.lhood = new TDoubleArrayList();
 		this.iterTime = new TDoubleArrayList();
 		this.startIter = 0;
+		
+		// notice: this.topics is not initialized in this abstract class,
+		// in each sub class, the topics variable is initialized differently.
 	}
 	
+	/**
+	 * This function loads vocab, loads tree, and initialize parameters.
+	 */
 	public void initialize(String treeFiles, String hyperFile, String vocabFile) {
 		this.loadVocab(vocabFile);
 		this.topics.initializeParams(treeFiles, hyperFile, this.vocab);
@@ -116,6 +131,10 @@ public abstract class TreeTopicSampler {
 		return this.numIterations;
 	}
 	
+	/**
+	 * This function adds instances given the training data in mallet input data format.
+	 * For each token in a document, sample a topic and then sample a path based on prior. 
+	 */
 	public void addInstances(InstanceList training) {
 		boolean debug = false;
 		int count = 0;
@@ -151,6 +170,9 @@ public abstract class TreeTopicSampler {
 		
 	}
 	
+	/**
+	 * Resume instance states from the saved states file. 
+	 */
 	public void resumeStates(InstanceList training, String statesFile) throws IOException{
 		FileInputStream statesfstream = new FileInputStream(statesFile);
 		DataInputStream statesdstream = new DataInputStream(statesfstream);
@@ -194,6 +216,9 @@ public abstract class TreeTopicSampler {
 		states.close();
 	}
 	
+	/**
+	 * Resume lhood and iterTime from the saved lhood file. 
+	 */
 	public void resumeLHood(String lhoodFile) throws IOException{
 		FileInputStream lhoodfstream = new FileInputStream(lhoodFile);
 		DataInputStream lhooddstream = new DataInputStream(lhoodfstream);
@@ -217,6 +242,9 @@ public abstract class TreeTopicSampler {
 		brLHood.close();
 	}
 	
+	/**
+	 * Resumes from the saved files.
+	 */
 	public void resume(InstanceList training, String resumeDir) {
 		try {
 			String statesFile = resumeDir + ".states";
@@ -229,6 +257,12 @@ public abstract class TreeTopicSampler {
 		}
 	}
 	
+	/**
+	 * This function clears the topic and path assignments for some words:
+	 * (1) term option: only clears the topic and path for constraint words;
+	 * (2) doc option: clears the topic and path for documents which contain 
+	 *     at least one of the constraint words.
+	 */
 	public void clearTopicAssignments(String option, String consFile) {
 		this.loadConstraints(consFile);
 		if (this.cons == null || this.cons.size() <= 0) {
@@ -270,6 +304,10 @@ public abstract class TreeTopicSampler {
 		}
 	}
 	
+	/**
+	 * This function defines how to change a topic during the sampling process.
+	 * It handles the case where both new_topic and old_topic are "-1" (empty topic).
+	 */
 	public void changeTopic(int doc, int index, int word, int new_topic, int new_path) {
 		DocData current_doc = this.data.get(doc);
 		int old_topic = current_doc.topics.get(index);
@@ -293,6 +331,10 @@ public abstract class TreeTopicSampler {
 		}
 	}
 	
+	/**
+	 * This function defines the sampling process, computes the likelihood and running time,
+	 * and specifies when to save the states files.
+	 */
 	public void estimate(int numIterations, String outputFolder, int outputInterval, int topWords) {
 		// update parameters
 		this.topics.updateParams();
@@ -320,6 +362,9 @@ public abstract class TreeTopicSampler {
 		}
 	}
 	
+	/**
+	 * The function computes the document likelihood.
+	 */
 	public double docLHood() {
 		int docNum = this.data.size();
 		
@@ -340,10 +385,17 @@ public abstract class TreeTopicSampler {
 		return val;
 	}
 	
+	/**
+	 * This function returns the likelihood.
+	 */
 	public double lhood() {
 		return this.docLHood() + this.topics.topicLHood();
 	}
 	
+	/**
+	 * This function reports the detected topics, the documents topics,
+	 * and saves states file and lhood file.
+	 */
 	public void report(String outputDir, int topWords) throws IOException {
 
 		String topicKeysFile = outputDir + ".topics";
@@ -359,12 +411,19 @@ public abstract class TreeTopicSampler {
 		this.printStats (new File(statsFile));
 	}
 	
+	/**
+	 * This function prints the topic words of each topic.
+	 */
 	public void printTopWords(File file, int numWords) throws IOException {
 		PrintStream out = new PrintStream (file);
 		out.print(displayTopWords(numWords));
 		out.close();
 	}
 	
+	/**
+	 * By implementing the comparable interface, this function ranks the words
+	 * in each topic, and returns the top words for each topic.
+	 */
 	public String displayTopWords (int numWords) {
 		
 		class WordProb implements Comparable {
@@ -406,13 +465,14 @@ public abstract class TreeTopicSampler {
 					break;
 				}
 			}	
-		}
-		
+		}	
 		return out.toString();
 	}
 	
-	public void printDocumentTopics (File file) 
-		throws IOException {
+	/**
+	 * Prints the index, original document dir, topic counts for each document.
+	 */
+	public void printDocumentTopics (File file) throws IOException {
 		PrintStream out = new PrintStream (file);
 		
 		for (int dd = 0; dd < this.data.size(); dd++) {
@@ -427,6 +487,9 @@ public abstract class TreeTopicSampler {
 		out.close();
 	}
 	
+	/**
+	 * Prints the topic and path of each word for all documents.
+	 */
 	public void printState (File file) throws IOException {
 		//PrintStream out =
 		//	new PrintStream(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(file))));
@@ -445,6 +508,9 @@ public abstract class TreeTopicSampler {
 		out.close();
 	}
 	
+	/**
+	 * Prints likelihood and iter time.
+	 */
 	public void printStats (File file) throws IOException {
 		PrintStream out = new PrintStream (file);
 		String tmp = "Iteration\t\tlikelihood\titer_time\n";
@@ -519,6 +585,9 @@ public abstract class TreeTopicSampler {
 
 	}
 	
+	/**
+	 * For testing~~
+	 */
 	public void myAssert(boolean flag, String info) {
 		if(!flag) {
 			System.out.println(info);

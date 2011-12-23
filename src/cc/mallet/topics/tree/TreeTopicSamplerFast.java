@@ -11,6 +11,17 @@ import java.util.Arrays;
 import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import cc.mallet.util.Randoms;
 
+/**
+ * This class defines a fast tree topic sampler, which calls the fast tree topic model.
+ * (1) It divides the sampling into three bins: smoothing, topic beta, topic term.
+ *     as Yao and Mimno's paper, KDD, 2009.
+ * (2) Each time the smoothing, topic beta, and topic term are recomputed.
+ * It is faster, because,
+ * (1) For topic term, only compute the one with non-zero paths (see TreeTopicModelFast).
+ * (2) The normalizer is saved.
+ * (3) Topic counts for each documents are ranked.
+ * Author: Yuening Hu
+ */
 public class TreeTopicSamplerFast extends TreeTopicSampler {
 	
 	public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed) {
@@ -18,6 +29,10 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 		this.topics = new TreeTopicModelFast(this.numTopics, this.random);
 	}
 	
+	/**
+	 * For each word in a document, firstly covers its topic and path, then sample a
+	 * topic and path, and update.
+	 */
 	public void sampleDoc(int doc_id){
 		DocData doc = this.data.get(doc_id);
 		//System.out.println("doc " + doc_id);
@@ -44,6 +59,7 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 			
 			int[] paths = this.topics.getWordPathIndexSet(word);
 			
+			// sample the smoothing bin
 			if (sample < smoothing_mass) {
 				for (int tt = 0; tt < this.numTopics; tt++) {
 					for (int pp : paths) {
@@ -65,6 +81,7 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 				sample -= smoothing_mass;
 			}
 			
+			// sample the topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
@@ -86,6 +103,7 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 				sample -= topic_beta_mass;
 			}
 			
+			// sample the topic term bin
 			if (new_topic < 0) {
 				int[] topic_set = topic_term_score.getKey1Set();
 				for (int tt : topic_set) {
@@ -112,6 +130,7 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 	}
 	
 	/////////////////////////////
+	// The following methods are for testing only.
 	
 	public double callComputeTermTopicBeta(TIntIntHashMap topic_counts, int word) {
 		return this.topics.computeTermTopicBeta(topic_counts, word);

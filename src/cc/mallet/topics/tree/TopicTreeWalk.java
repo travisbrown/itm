@@ -4,6 +4,10 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 
+/**
+ * This class counts each node and each edge for a topic with tree structure. 
+ * Author: Yuening Hu
+ */
 public class TopicTreeWalk {
 	
 	// *** To be sorted
@@ -15,6 +19,12 @@ public class TopicTreeWalk {
 		this.nodeCounts = new TIntIntHashMap();
 	}
 
+	/**
+	 * Given a path (a list of nodes), increase the nodes and edges counts by 
+	 * the specified amount. When a node count is changed from zero or changed
+	 * to zero, return this node. (When this happens, the non-zero path of this
+	 * node might need to be changed, that's why we need this list.)
+	 */
 	public int[] changeCount(TIntArrayList path_nodes, int increment) {
 		for (int nn = 0; nn < path_nodes.size()-1; nn++) {
 			int parent = path_nodes.get(nn);
@@ -48,6 +58,9 @@ public class TopicTreeWalk {
 		}
 	}
 	
+	/**
+	 * Return an edge count.
+	 */
 	public int getCount(int key1, int key2) {
 		if (this.counts.contains(key1, key2)) {
 			return this.counts.get(key1, key2);
@@ -55,6 +68,9 @@ public class TopicTreeWalk {
 		return 0;
 	}
 	
+	/**
+	 * Return a node count.
+	 */
 	public int getNodeCount(int key) {
 		if (this.nodeCounts.contains(key)) {
 			return this.nodeCounts.get(key);

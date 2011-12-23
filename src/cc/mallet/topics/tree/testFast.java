@@ -10,15 +10,18 @@ import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import cc.mallet.types.InstanceList;
 import junit.framework.TestCase;
 
-
+/**
+ * This class tests the fast sampler.
+ * Author: Yuening Hu
+ */
 public class testFast extends TestCase{
 	
 	public TreeTopicSamplerFast Initialize() {
 		
-		String inputFile = "../input/toy-topic-input.mallet";
-		String treeFiles = "../toy/toy.wn.*";
-		String hyperFile = "../toy/tree_hyperparams";
-		String vocabFile = "../toy/toy.voc";		
+		String inputFile = "input/toy/toy-topic-input.mallet";
+		String treeFiles = "input/toy/toy.wn.*";
+		String hyperFile = "input/toy/tree_hyperparams";
+		String vocabFile = "input/toy/toy.voc";		
 		int numTopics = 3;
 		double alpha_sum = 0.3;
 		int randomSeed = 0;

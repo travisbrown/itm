@@ -34,6 +34,11 @@ import cc.mallet.types.InstanceList;
 import cc.mallet.types.LabelAlphabet;
 import cc.mallet.util.Randoms;
 
+/**
+ * This class defines a naive tree topic sampler.
+ * It calls the naive tree topic model.
+ * Author: Yuening Hu
+ */
 public class TreeTopicSamplerNaive extends TreeTopicSampler {
 		
 	public TreeTopicSamplerNaive (int numberOfTopics, double alphaSum) {
@@ -45,6 +50,10 @@ public class TreeTopicSamplerNaive extends TreeTopicSampler {
 		this.topics = new TreeTopicModelNaive(this.numTopics, this.random);
 	}
 
+	/**
+	 * For each word in a document, firstly covers its topic and path, then sample a
+	 * topic and path, and update.
+	 */
 	public void sampleDoc(int doc_id){
 		DocData doc = this.data.get(doc_id);
 		//System.out.println("doc " + doc_id);

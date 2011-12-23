@@ -14,6 +14,12 @@ import java.util.Random;
 
 import cc.mallet.types.Dirichlet;
 
+/**
+ * This class defines the tree topic model. 
+ * It implements most of the functions and leave four abstract methods,
+ * which might be various for different models.
+ * Author: Yuening Hu
+ */
 public abstract class TreeTopicModel {
 	
 	int numTopics;
@@ -26,13 +32,16 @@ public abstract class TreeTopicModel {
 
 	TIntDoubleHashMap betaSum;
 	HIntIntDoubleHashMap beta; // 2 levels hash map
+	//HIntIntObjectHashMap<Double> beta;
 	TIntDoubleHashMap priorSum;
 	HIntIntDoubleHashMap priorPath;
+	//HIntIntObjectHashMap<Double> priorPath;
 	
 	TIntObjectHashMap<HIntIntIntHashMap> nonZeroPaths;
 	TIntObjectHashMap<TopicTreeWalk> traversals;
 	
 	HIntIntDoubleHashMap normalizer;
+	//HIntIntObjectHashMap<Double> normalizer;
 	TIntDoubleHashMap rootNormalizer;
 	TIntDoubleHashMap smoothingEst;
 	
@@ -42,8 +51,10 @@ public abstract class TreeTopicModel {
 		
 		this.betaSum = new TIntDoubleHashMap ();
 		this.beta = new HIntIntDoubleHashMap ();
+		//this.beta = new HIntIntObjectHashMap<Double> ();
 		this.priorSum = new TIntDoubleHashMap ();
 		this.priorPath = new HIntIntDoubleHashMap ();
+		//this.priorPath = new HIntIntObjectHashMap<Double> ();
 		
 		this.wordPaths = new HIntIntObjectHashMap<TIntArrayList> ();
 		this.pathToWord = new TIntArrayList ();
@@ -53,6 +64,15 @@ public abstract class TreeTopicModel {
 		this.traversals = new TIntObjectHashMap<TopicTreeWalk> ();
 	}
 	
+	/**
+	 * Initialize the parameters, including:
+	 * (1) loading the tree
+	 * (2) initialize betaSum and beta
+	 * (3) initialize priorSum, priorPath
+	 * (4) initialize wordPaths, pathToWord, NodetoPath
+	 * (5) initialize traversals
+	 * (6) initialize nonZeroPaths
+	 */
 	protected void initializeParams(String treeFiles, String hyperFile, ArrayList<String> vocab) {
 		
 		PriorTree tree = new PriorTree();
@@ -188,6 +208,10 @@ public abstract class TreeTopicModel {
 		}
 	}
 	
+	/**
+	 * This function samples a path based on the prior
+	 * and change the node and edge count for a topic.
+	 */
 	protected int initialize (int word, int topic) {
 		double sample = this.random.nextDouble();
 		int path_index = this.samplePathFromPrior(word, sample);
@@ -195,12 +219,18 @@ public abstract class TreeTopicModel {
 		return path_index;
 	}
 	
+	/**
+	 * This function changes the node and edge count for a topic.
+	 */
 	protected void changeCountOnly(int topic, int word, int path, int delta) {
 		TIntArrayList path_nodes = this.wordPaths.get(word, path);
 		TopicTreeWalk tw = this.traversals.get(topic);
 		tw.changeCount(path_nodes, delta);
 	}
 	
+	/**
+	 * This function samples a path from the prior.
+	 */
 	protected int samplePathFromPrior(int term, double sample) {
 		int sampled_path = -1;
 		sample *= this.priorSum.get(term);
@@ -218,6 +248,9 @@ public abstract class TreeTopicModel {
 		return sampled_path;
 	}
 	
+	/**
+	 * This function computes a path probability in a topic.
+	 */
 	public double computeTopicPathProb(int topic, int word, int path_index) {
 		TIntArrayList path_nodes = this.wordPaths.get(word, path_index);
 		TopicTreeWalk tw = this.traversals.get(topic);
@@ -231,6 +264,9 @@ public abstract class TreeTopicModel {
 		return val;
 	}
 	
+	/**
+	 * This function computes the topic likelihood (by node).
+	 */
 	public double topicLHood() {
 		double val = 0.0;
 		for (int tt = 0; tt < this.numTopics; tt++) {

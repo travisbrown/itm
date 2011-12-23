@@ -2,6 +2,11 @@ package cc.mallet.topics.tree;
 
 import gnu.trove.TIntArrayList;
 
+/**
+ * This class defines a path. 
+ * A path is a list of nodes, and the last node emits a word.
+ * Author: Yuening Hu
+ */
 public class Path {
 	
 	TIntArrayList nodes;
@@ -13,6 +18,9 @@ public class Path {
 		this.finalWord = -1;
 	}
 	
+	/**
+	 * Add nodes to this path.
+	 */
 	public void addNodes (TIntArrayList innodes) {
 		for (int ii = 0; ii < innodes.size(); ii++) {
 			int node_index = innodes.get(ii);
@@ -20,14 +28,23 @@ public class Path {
 		}
 	}
 	
+	/**
+	 * Add the final word of this path.
+	 */
 	public void addFinalWord(int word) {
 		this.finalWord = word;
 	}
 	
+	/**
+	 * return the node list.
+	 */
 	public TIntArrayList getNodes() {
 		return this.nodes;
 	}
 	
+	/**
+	 * return the final word.
+	 */
 	public int getFinalWord() {
 		return this.finalWord;
 	}

@@ -5,6 +5,13 @@ import gnu.trove.TIntDoubleHashMap;
 
 import java.util.Random;
 
+/**
+ * This class extends the tree topic model fast class
+ * Only add one more function, it computes the smoothing for each word
+ * only based on the prior (treat the real count as zero), so it 
+ * serves as the upper bound of smoothing.
+ * Author: Yuening Hu
+ */
 public class TreeTopicModelFastEst extends TreeTopicModelFast {
 	
 	public TreeTopicModelFastEst(int numTopics, Random random) {
@@ -12,6 +19,9 @@ public class TreeTopicModelFastEst extends TreeTopicModelFast {
 		this.smoothingEst = new TIntDoubleHashMap();
 	}
 	
+	/**
+	 * This function computes the upper bound of smoothing bucket. 
+	 */
 	public void computeSmoothingEst(double[] alpha) {
 		for(int ww : this.wordPaths.getKey1Set()) {
 			this.smoothingEst.put(ww, 0.0);
