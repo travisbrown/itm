@@ -37,7 +37,7 @@ public abstract class TreeTopicSampler {
 	/**
 	 * This class defines the format of a document.
 	 */
-	public class DocData implements Serializable {
+	public class DocData {
 		TIntArrayList tokens;
 		TIntArrayList topics;
 		TIntArrayList paths;

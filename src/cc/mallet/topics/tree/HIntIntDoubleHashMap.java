@@ -40,7 +40,7 @@ public class HIntIntDoubleHashMap {
 	 */
 	public double get(int key1, int key2) {
 		if (this.data.contains(key1)) {
-			TIntDoubleHashMap tmp1 = (TIntDoubleHashMap) this.data.get(key1);
+			TIntDoubleHashMap tmp1 = this.data.get(key1);
 			if (tmp1.contains(key2)) {
 				return tmp1.get(key2);
 			}

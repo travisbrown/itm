@@ -20,9 +20,9 @@ public class TreeTopicModelFastSort extends TreeTopicModelFast {
 	int TOPIC_BITS = 16;
 	
 	public class ValueComparator implements Comparator {
-		Map map;
+		HashMap<Integer, Integer> map;
 		Comparator comparator;
-		public ValueComparator(Map map) {
+		public ValueComparator(HashMap<Integer, Integer> map) {
 			this.map = map;
 			comparator = Ordering.natural().reverse().onResultOf(Functions.forMap(map)).compound(Ordering.natural());
 		}
@@ -74,7 +74,7 @@ public class TreeTopicModelFastSort extends TreeTopicModelFast {
 			int key = (topic << TOPIC_BITS) + path;
 			TreeMap<Integer, Integer> treemap = this.nonZeroPathsSorted.get(ww);
 			ValueComparator comparator = (ValueComparator)treemap.comparator();
-			Map map = comparator.map;
+			HashMap<Integer, Integer> map = comparator.map;
 			
 			map.put(key, val);
 			treemap.put(key, val);
@@ -105,7 +105,7 @@ public class TreeTopicModelFastSort extends TreeTopicModelFast {
 				}
 			}
 			ValueComparator comparator = new ValueComparator(tmpMap);
-			TreeMap<Integer, Integer> sorted_map = new TreeMap(comparator);
+			TreeMap<Integer, Integer> sorted_map = new TreeMap<Integer, Integer>(comparator);
 			sorted_map.putAll(tmpMap);
 			this.nonZeroPathsSorted.put(ww, sorted_map);
 			
@@ -137,7 +137,7 @@ public class TreeTopicModelFastSort extends TreeTopicModelFast {
 		int key = (topic << TOPIC_BITS) + path_index;
 		TreeMap<Integer, Integer> treemap = this.nonZeroPathsSorted.get(word);
 		ValueComparator comparator = (ValueComparator)treemap.comparator();
-		Map map = comparator.map;
+		HashMap<Integer, Integer> map = comparator.map;
 		if (map.containsKey(key)) {
 			TreeTopicSampler.myAssert(treemap.containsKey(key), "Error!");
 			//System.out.println(map.get(key) + " " + key);
