@@ -277,13 +277,15 @@ public abstract class TreeTopicModel {
 		for (int tt = 0; tt < this.numTopics; tt++) {
 			for (int nn : this.betaSum.keys()) {
 				double beta_sum = this.betaSum.get(nn);
-				val += Dirichlet.logGamma(beta_sum) * this.beta.get(nn).size();
+				//val += Dirichlet.logGamma(beta_sum) * this.beta.get(nn).size();
+				val += Dirichlet.logGamma(beta_sum);
 				
 				double tmp = 0.0;
 				for (int cc : this.beta.get(nn).keys()) {
 					tmp += Dirichlet.logGamma(this.beta.get(nn, cc));
 				}
-				val -= tmp * this.beta.get(nn).size();
+				//val -= tmp * this.beta.get(nn).size();
+				val -= tmp;
 				
 				for (int cc : this.beta.get(nn).keys()) {
 					int count = this.traversals.get(tt).getCount(nn, cc);
