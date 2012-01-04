@@ -41,7 +41,7 @@ public class TreeTopicModelNaive extends TreeTopicModel{
 	 * this function computes the probability per path per topic directly
 	 * according to the sampleing equation.
 	 */
-	public double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, HIntIntDoubleHashMap dict) {
+	public double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, ArrayList<double[]> dict) {
 		double norm = 0.0;
 		int[] paths = this.getWordPathIndexSet(word);
 		for(int tt = 0; tt < this.numTopics; tt++) {
@@ -51,7 +51,8 @@ public class TreeTopicModelNaive extends TreeTopicModel{
 				int path_index = paths[pp];
 				double val = this.computeTopicPathProb(tt, word, path_index);
 				val *= (topic_alpha + topic_count);
-				dict.put(tt, path_index, val);
+				double[] tmp = {tt, path_index, val};
+				dict.add(tmp);
 				norm += val;
 			}
 		}

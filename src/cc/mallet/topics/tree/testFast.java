@@ -5,6 +5,7 @@ import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import cc.mallet.types.InstanceList;
@@ -21,7 +22,7 @@ public class testFast extends TestCase{
 		String inputFile = "input/toy/toy-topic-input.mallet";
 		String treeFiles = "input/toy/toy.wn.*";
 		String hyperFile = "input/toy/tree_hyperparams";
-		String vocabFile = "input/toy/toy.voc";		
+		String vocabFile = "input/toy/toy.voc";	
 		int numTopics = 3;
 		double alpha_sum = 0.3;
 		int randomSeed = 0;
@@ -52,6 +53,7 @@ public class testFast extends TestCase{
 	
 	public void testUpdateParams() {
 		TreeTopicSamplerFast topicModel = this.Initialize();
+		topicModel.topics.updateParams();
 		
 		for(int dd = 0; dd < topicModel.data.size(); dd++) {
 			System.out.println(topicModel.data.get(dd));
@@ -65,7 +67,7 @@ public class testFast extends TestCase{
 			}
 		}
 		
-		System.out.println("**************\\nNon zero paths");
+		System.out.println("**************\nNon zero paths");
 		for(int ww : topicModel.topics.nonZeroPaths.keys()) {
 			for(int tt : topicModel.topics.nonZeroPaths.get(ww).getKey1Set()) {
 				for(int pp : topicModel.topics.nonZeroPaths.get(ww).get(tt).keys()) {
@@ -77,6 +79,7 @@ public class testFast extends TestCase{
 	
 	public void testUpdatePathmaskedCount() {
 		TreeTopicSamplerFast topicModel = this.Initialize();
+		topicModel.topics.updateParams();
 		int numPaths = topicModel.topics.pathToWord.size();
 		
 		TreeTopicModelFast topics = (TreeTopicModelFast)topicModel.topics;
@@ -108,6 +111,7 @@ public class testFast extends TestCase{
 	
 	public void testChangeTopic() {
 		TreeTopicSamplerFast topicModel = this.Initialize();
+		topicModel.topics.updateParams();
 		TreeTopicModelFast topics = (TreeTopicModelFast)topicModel.topics;
 		//for(int dd = 0; dd < topicModel.data.size(); dd++){
 		for(int dd = 0; dd < 1; dd++){
@@ -186,8 +190,10 @@ public class testFast extends TestCase{
 	
 	public void testBinValues() {
 		TreeTopicSamplerFast topicModelFast = this.Initialize();
+		topicModelFast.topics.updateParams();
 		
 		TreeTopicSamplerNaive topicModelNaive = testNaive.Initialize();
+		topicModelNaive.topics.updateParams();
 		
 		//for(int dd = 0; dd < topicModelFast.data.size(); dd++){
 		for(int dd = 0; dd < 1; dd++){
@@ -202,7 +208,7 @@ public class testFast extends TestCase{
 				
 				double smoothing = topicModelFast.callComputeTermSmoothing(word);
 				double topicbeta = topicModelFast.callComputeTermTopicBeta(doc.topicCounts, word);
-				HIntIntDoubleHashMap dict = new HIntIntDoubleHashMap();
+				ArrayList<double[]> dict = new ArrayList<double[]>();
 				double topictermscore = topicModelFast.topics.computeTopicTerm(topicModelFast.alpha, 
 						doc.topicCounts, word, dict);
 				double norm = smoothing + topicbeta + topictermscore;
@@ -220,10 +226,10 @@ public class testFast extends TestCase{
 				System.out.println(topicbeta + " " + topicbeta1);
 				System.out.println(topictermscore + " " + topictermscore1);
 				
-				HIntIntDoubleHashMap dict2 = new HIntIntDoubleHashMap();
+				ArrayList<double[]> dict2 = new ArrayList<double[]>();
 				double norm2 = topicModelFast.computeTopicTermTest(topicModelNaive.alpha, doc.topicCounts, word, dict2);
 				
-				HIntIntDoubleHashMap dict3 = new HIntIntDoubleHashMap();
+				ArrayList<double[]> dict3 = new ArrayList<double[]>();
 				double norm3 = topicModelNaive.topics.computeTopicTerm(topicModelNaive.alpha, doc.topicCounts, word, dict3);
 
 				System.out.println(norm + " " + norm1 + " " + norm2 + " " + norm3);

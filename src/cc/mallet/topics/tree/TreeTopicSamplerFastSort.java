@@ -22,13 +22,13 @@ import cc.mallet.util.Randoms;
  * (3) Topic counts for each documents are ranked.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerFast extends TreeTopicSampler {
+public class TreeTopicSamplerFastSort extends TreeTopicSamplerSort {
 	
-	public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed) {
+	public TreeTopicSamplerFastSort (int numberOfTopics, double alphaSum, int seed) {
 		super(numberOfTopics, alphaSum, seed);
-		//this.topics = new TreeTopicModelFast(this.numTopics, this.random);
+		this.topics = new TreeTopicModelFast(this.numTopics, this.random);
 		//this.topics = new TreeTopicModelFastSort(this.numTopics, this.random);
-		this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
+		//this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
 	}
 	
 	/**
@@ -44,12 +44,12 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 			int word = doc.tokens.get(ii);
 			
 			this.changeTopic(doc_id, ii, word, -1, -1);
-			
+						
 			double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
-			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
+			double topic_beta_mass = this.topics.computeTermTopicBetaSort(doc.topicCounts, word);
 			
 			ArrayList<double[]> topic_term_score = new ArrayList<double[]> ();
-			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
+			double topic_term_mass = this.topics.computeTopicTermSort(this.alpha, doc.topicCounts, word, topic_term_score);
 			
 			double norm = smoothing_mass + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();
@@ -85,9 +85,13 @@ public class TreeTopicSamplerFast extends TreeTopicSampler {
 			
 			// sample the topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
-				for(int tt : doc.topicCounts.keys()) {
-					for (int pp : paths) {
-						double val = doc.topicCounts.get(tt) * this.topics.getPathPrior(word, pp);
+				
+				for(int jj = 0; jj < doc.topicCounts.size(); jj++) {
+					int[] current = doc.topicCounts.get(jj);
+					int tt = current[0];
+					int count = current[1];
+					for(int pp : paths) {
+						double val = count * this.topics.getPathPrior(word, pp);
 						val /= this.topics.getNormalizer(tt, pp);
 						sample -= val;
 						if (sample <= 0.0) {

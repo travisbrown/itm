@@ -7,6 +7,7 @@ import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntObjectIterator;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -41,7 +42,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	 * and plus the real count. 
 	 * If a node path is shorter than Tree_depth, use "1" to fill the remained part.
 	 */
-	private void updatePathMaskedCount(int path, int topic) {
+	protected void updatePathMaskedCount(int path, int topic) {
 		TopicTreeWalk tw = this.traversals.get(topic);
 		int ww = this.getWordFromPath(path);
 		TIntArrayList path_nodes = this.wordPaths.get(ww, path);
@@ -74,6 +75,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 			count--;
 		}
 		
+		int maskedpath = val;
 		// plus the original count
 		val += original_count;
 		if (val > 0) {
@@ -87,13 +89,19 @@ public class TreeTopicModelFast extends TreeTopicModel {
 			}
 		}
 
+//		int shift = this.INTBITS - this.maxDepth - 1;
+//		int testmaskedpath = val >> shift;
+//		maskedpath = maskedpath >> shift;
+//		int testcount = val - (testmaskedpath << shift);
+//		System.out.println(maskedpath + " " + testmaskedpath + " " + original_count + " " + testcount);
+		
 		//System.out.println(original_count + " " + this.nonZeroPaths.get(ww).get(topic, path));
 	}
 	
 	/**
 	 * Compute the root normalizer and the normalizer per topic per path
 	 */
-	private void computeNormalizer(int topic) {
+	protected void computeNormalizer(int topic) {
 		TopicTreeWalk tw = this.traversals.get(topic);
 		double val = this.betaSum.get(root) + tw.getNodeCount(root);
 		this.rootNormalizer.put(topic, val);
@@ -126,7 +134,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	/**
 	 * Compute the root normalizer and the normalizer per topic per path.
 	 */
-	private int[] findAffectedPaths(int[] nodes) {
+	protected int[] findAffectedPaths(int[] nodes) {
 		TIntHashSet affected = new TIntHashSet();
 		for(int ii = 0; ii < nodes.length; ii++) {
 			int node = nodes[ii];
@@ -142,7 +150,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	/**
 	 * Updates a list of paths with the given amount.
 	 */
-	private void updateNormalizer(int topic, TIntArrayList paths, double delta) {
+	protected void updateNormalizer(int topic, TIntArrayList paths, double delta) {
 		for (int ii = 0; ii < paths.size(); ii++) {
 			int pp = paths.get(ii);
 			double val = this.normalizer.get(topic, pp);
@@ -154,7 +162,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	/**
 	 * Computes the observation part.
 	 */
-	private double getObservation(int topic, int word, int path_index) {
+	protected double getObservation(int topic, int word, int path_index) {
 		TIntArrayList path_nodes = this.wordPaths.get(word, path_index);
 		TopicTreeWalk tw = this.traversals.get(topic);
 		double val = 1.0;
@@ -176,7 +184,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 				this.updatePathMaskedCount(pp, tt);				
 			}
 			this.computeNormalizer(tt);
-		}
+		}		
 	}
 	
 	/**
@@ -272,9 +280,31 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	}
 	
 	/**
+	 * This function computes the topic beta bucket.
+	 */
+	public double computeTermTopicBetaSort(ArrayList<int[]> topic_counts, int word) {
+		double topic_beta = 0.0;
+		int[] paths = this.getWordPathIndexSet(word);
+		for(int ii = 0; ii < topic_counts.size(); ii++) {
+			int[] current = topic_counts.get(ii);
+			int tt = current[0];
+			int count = current[1];
+			if (count > 0 ) {
+				for (int pp : paths) {
+					double val = count * this.getPathPrior(word, pp);
+					val /= this.getNormalizer(tt, pp);
+					topic_beta += val;
+				}
+			}
+		}
+		//myAssert(topic_beta > 0, "something wrong with topic_beta!");
+		return topic_beta;
+	}
+	
+	/**
 	 * This function computes the topic term bucket.
 	 */
-	public double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, HIntIntDoubleHashMap dict) {
+	public double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, ArrayList<double[]> dict) {
 		double norm = 0.0;
 		HIntIntIntHashMap nonzeros = this.nonZeroPaths.get(word);
 		
@@ -289,14 +319,48 @@ public class TreeTopicModelFast extends TreeTopicModel {
 				double val = this.getObservation(tt, word, path);
 				val *= (topic_alpha + topic_count);
 				val /= this.getNormalizer(tt, path);
-				dict.put(tt, path, val);
+				double[] tmp = {tt, path, val};
+				dict.add(tmp);
 				norm += val;
 			}
 		}
 		return norm;
 	}
 
-
+	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
+		double norm = 0.0;
+		HIntIntIntHashMap nonzeros = this.nonZeroPaths.get(word);
+		
+		
+		int[] tmpTopics = new int[this.numTopics];
+		for(int jj = 0; jj < this.numTopics; jj++) {
+			tmpTopics[jj] = 0;
+		}
+		for(int jj = 0; jj < local_topic_counts.size(); jj++) {
+			int[] current = local_topic_counts.get(jj);
+			int tt = current[0];
+			tmpTopics[tt] = current[1];
+		}
+		
+		// Notice only the nonzero paths are considered
+		//for(int tt = 0; tt < this.numTopics; tt++) {
+		for(int tt : nonzeros.getKey1Set()) {
+			double topic_alpha = alpha[tt];
+			int topic_count = tmpTopics[tt];
+			//local_topic_counts.get(ii);
+			int[] paths = nonzeros.get(tt).keys();
+			for (int pp = 0; pp < paths.length; pp++) {
+				int path = paths[pp];
+				double val = this.getObservation(tt, word, path);
+				val *= (topic_alpha + topic_count);
+				val /= this.getNormalizer(tt, path);
+				double[] tmp = {tt, path, val};
+				dict.add(tmp);
+				norm += val;
+			}
+		}
+		return norm;
+	}
 	//////////////////////////////////////////////////////////
 	
 	

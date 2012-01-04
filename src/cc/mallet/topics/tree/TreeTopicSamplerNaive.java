@@ -63,7 +63,7 @@ public class TreeTopicSamplerNaive extends TreeTopicSampler {
 			int word = doc.tokens.get(ii);
 			
 			this.changeTopic(doc_id, ii, word, -1, -1);
-			HIntIntDoubleHashMap topic_term_score = new HIntIntDoubleHashMap();
+			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
 			double norm = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
 			//System.out.println(norm);
 			
@@ -74,20 +74,15 @@ public class TreeTopicSamplerNaive extends TreeTopicSampler {
 			//double sample = 0.8;
 			sample *= norm;
 			
-			int[] topic_set = topic_term_score.getKey1Set();
-			for (int tt : topic_set) {
-				int[] path_set = topic_term_score.get(tt).keys();
-				for (int pp : path_set) {
-					double val = topic_term_score.get(tt, pp);
-					//System.out.println(tt + " " + pp + " " + val);
-					sample -= val;
-					if (sample <= 0.0) {
-						new_topic = tt;
-						new_path = pp;
-						break;
-					}
-				}
-				if (new_topic >= 0) {
+			for(int jj = 0; jj < topic_term_score.size(); jj++) {
+				double[] tmp = topic_term_score.get(jj);
+				int tt = (int) tmp[0];
+				int pp = (int) tmp[1];
+				double val = tmp[2];
+				sample -= val;
+				if (sample <= 0.0) {
+					new_topic = tt;
+					new_path = pp;
 					break;
 				}
 			}

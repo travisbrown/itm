@@ -23,7 +23,7 @@ cat input/synthetic/synthetic.wn.0 | protoc tree/lib/proto/wordnet_file.proto --
 cat input/synthetic/synthetic.wn.1 | protoc tree/lib/proto/wordnet_file.proto --decode=topicmod_projects_ldawn.WordNetFile --proto_path=tree/lib/proto/ > input/synthetic/tmp1.txt
 
 (5) Train tree topic models:
-bin/mallet train-topics --input input/synthetic-topic-input.mallet --num-topics 5 --num-iterations 300 --alpha 0.5 --random-seed 0 --output-interval 10 --output-dir output/model --use-tree-lda True --tree input/synthetic.wn --tree-hyperparameters input/tree_hyperparams --vocab input/synthetic.voc --clear-type term --constraint input/empty.cons
+bin/mallet train-topics --input input/synthetic-topic-input.mallet --num-topics 5 --num-iterations 300 --alpha 0.5 --random-seed 0 --output-interval 10 --output-dir output/model --use-tree-lda True --tree-model-type fast --tree input/synthetic.wn --tree-hyperparameters input/tree_hyperparams --vocab input/synthetic.voc --clear-type term --constraint input/empty.cons
 
 (6) Resume tree topic models:
 bin/mallet train-topics --input input/synthetic-topic-input.mallet --num-topics 5 --num-iterations 600 --alpha 0.5 --random-seed 0 --output-interval 10 --output-dir output/model --use-tree-lda True --tree input/synthetic.wn --tree-hyperparameters input/tree_hyperparams --vocab input/synthetic.voc --clear-type term --constraint input/empty.cons --resume true --resume-dir output/model

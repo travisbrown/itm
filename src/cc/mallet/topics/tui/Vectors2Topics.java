@@ -20,7 +20,9 @@ import cc.mallet.topics.tree.PriorTree;
 import cc.mallet.topics.tree.TreeTopicSampler;
 import cc.mallet.topics.tree.TreeTopicSamplerFast;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEst;
+import cc.mallet.topics.tree.TreeTopicSamplerFastSort;
 import cc.mallet.topics.tree.TreeTopicSamplerNaive;
+import cc.mallet.topics.tree.TreeTopicSamplerSort;
 
 import java.io.*;
 
@@ -66,7 +68,7 @@ public class Vectors2Topics {
 	
 	static CommandOption.String modelType = new CommandOption.String
 	(Vectors2Topics.class, "tree-model-type", "TYPENAME", true, "fast-est",
-	 "Three possible types: naive, fast, fast-est.", null);
+	 "Three possible types: naive, fast, fast-est, fast-sort.", null);
 
 	static CommandOption.String treeFiles = new CommandOption.String
 	(Vectors2Topics.class, "tree", "FILENAME", true, null,
@@ -138,6 +140,9 @@ public class Vectors2Topics {
 					System.exit(0);
 				}
 				
+//				TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
+//						numTopics.value, alpha.value, randomSeed.value);
+				
 				// load tree and vocab
 				topicModel.initialize(treeFiles.value, hyperFile.value, vocabFile.value);
 	            topicModel.setNumIterations(numIterations.value);
@@ -166,7 +171,7 @@ public class Vectors2Topics {
 									outputInteval.value, topWords.value);
 				
 				// topic report
-				System.out.println(topicModel.displayTopWords(topWords.value));
+				//System.out.println(topicModel.displayTopWords(topWords.value));
 			}
 		}		
 	}

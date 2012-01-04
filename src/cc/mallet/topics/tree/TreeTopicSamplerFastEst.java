@@ -1,5 +1,7 @@
 package cc.mallet.topics.tree;
 
+import java.util.ArrayList;
+
 import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntDoubleHashMap;
@@ -36,7 +38,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 			double smoothing_mass_est = this.topics.smoothingEst.get(word);
 			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
 			
-			HIntIntDoubleHashMap topic_term_score = new HIntIntDoubleHashMap();
+			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
 			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
@@ -103,20 +105,15 @@ public class TreeTopicSamplerFastEst extends TreeTopicSampler{
 			
 			// sample topic term bin
 			if (new_topic < 0) {
-				int[] topic_set = topic_term_score.getKey1Set();
-				for (int tt : topic_set) {
-					int[] path_set = topic_term_score.get(tt).keys();
-					for (int pp : path_set) {
-						double val = topic_term_score.get(tt, pp);
-						//System.out.println(tt + " " + pp + " " + val);
-						sample -= val;
-						if (sample <= 0.0) {
-							new_topic = tt;
-							new_path = pp;
-							break;
-						}
-					}
-					if (new_topic >= 0) {
+				for(int jj = 0; jj < topic_term_score.size(); jj++) {
+					double[] tmp = topic_term_score.get(jj);
+					int tt = (int) tmp[0];
+					int pp = (int) tmp[1];
+					double val = tmp[2];
+					sample -= val;
+					if (sample <= 0.0) {
+						new_topic = tt;
+						new_path = pp;
 						break;
 					}
 				}

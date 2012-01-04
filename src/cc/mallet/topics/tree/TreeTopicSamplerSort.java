@@ -6,33 +6,25 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.zip.GZIPOutputStream;
 
+import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import cc.mallet.types.Dirichlet;
 import cc.mallet.types.FeatureSequence;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import cc.mallet.util.Randoms;
 
-/**
- * This class defines the tree topic sampler, which loads the instances,  
- * reports the topics, and leaves the sampler method as an abstract method, 
- * which might be various for different methods.
- * Author: Yuening Hu
- */
-public abstract class TreeTopicSampler {
+public abstract class TreeTopicSamplerSort{
 	
 	/**
 	 * This class defines the format of a document.
@@ -42,11 +34,11 @@ public abstract class TreeTopicSampler {
 		TIntArrayList topics;
 		TIntArrayList paths;
 		// sort
-		TIntIntHashMap topicCounts;
+		ArrayList<int[]> topicCounts;
 		String docName;
 		
 		public DocData (String name, TIntArrayList tokens, TIntArrayList topics,
-				TIntArrayList paths, TIntIntHashMap topicCounts) {
+				TIntArrayList paths, ArrayList<int[]> topicCounts) {
 			this.docName = name;
 			this.tokens = tokens;
 			this.topics = topics;
@@ -72,16 +64,17 @@ public abstract class TreeTopicSampler {
 			result += paths.toString();
 			
 			result += "\ntopicCounts:   ";
-
-			for(TIntIntIterator it = this.topicCounts.iterator(); it.hasNext(); ) {
-				it.advance();
-				result += "Topic " + it.key() + ": " + it.value() + ", ";
+			
+			for(int ii = 0; ii < this.topicCounts.size(); ii++) {
+				int[] tmp = this.topicCounts.get(ii);
+				result += "Topic " + tmp[0] + ": " + tmp[1] + ", ";
 			}
+
 			result += "\n*****************\n";
 			return result;
 		}
 	}
-	
+		
 	int numTopics; // Number of topics to be fit
 	int numIterations;
 	int startIter;
@@ -95,7 +88,7 @@ public abstract class TreeTopicSampler {
 	TreeTopicModel topics;
 	TIntHashSet cons;
 	
-	public TreeTopicSampler (int numberOfTopics, double alphaSum, int seed) {
+	public TreeTopicSamplerSort (int numberOfTopics, double alphaSum, int seed) {
 		this.numTopics = numberOfTopics;
 		this.random = new Randoms(seed);
 
@@ -145,7 +138,7 @@ public abstract class TreeTopicSampler {
 
 			// *** remained problem: keep topicCounts sorted
 			TIntArrayList tokens = new TIntArrayList(original_tokens.getLength());
-			TIntIntHashMap topicCounts = new TIntIntHashMap ();			
+			ArrayList<int[]> topicCounts = new ArrayList<int[]> ();	
 			TIntArrayList topics = new TIntArrayList(original_tokens.getLength());
 			TIntArrayList paths = new TIntArrayList(original_tokens.getLength());
 
@@ -156,7 +149,8 @@ public abstract class TreeTopicSampler {
 				if(debug) { topic = count % numTopics; }
 				tokens.add(token);
 				topics.add(topic);
-				topicCounts.adjustOrPutValue(topic, 1, 1);
+				//topicCounts.adjustOrPutValue(topic, 1, 1);
+				this.updateTopicCounts(topicCounts, topic, 1, 1);
 				// sample a path for this topic
 				int path_index = this.topics.initialize(token, topic);
 				paths.add(path_index);
@@ -168,6 +162,99 @@ public abstract class TreeTopicSampler {
 			//System.out.println(doc);
 		}
 		
+	}
+	
+	/**
+	 * This function keeps the topicCounts in order by bubble sort.
+	 */
+	private void updateTopicCounts(ArrayList<int[]> topicCounts, int topic, int adjustvalue, int putvalue) {
+		
+		// remove old value
+		int value = -1;
+		for(int ii = 0; ii < topicCounts.size(); ii++) {
+			int[] tmp = topicCounts.get(ii);
+			if(tmp[0] == topic) {
+				value = tmp[1];
+				topicCounts.remove(ii);
+				break;
+			}
+		}
+		
+		// adjust the value and update or insert
+		if (value == -1) {
+			value = putvalue;
+		} else {
+			value += adjustvalue;
+		}
+		
+		int index = topicCounts.size();
+		for(int ii = 0; ii < topicCounts.size(); ii++) {
+			int[] tmp = topicCounts.get(ii);
+			if(value >= tmp[1]) {
+				index = ii;
+				break;
+			}
+		}
+		int[] newpair = {topic, value};
+		topicCounts.add(index, newpair);
+		
+	}
+	
+	/**
+	 * This function keeps the topicCounts in order by bubble sort.
+	 */
+	private void updateTopicCountsold (ArrayList<int[]> topicCounts, int topic, int adjustvalue, int putvalue) {
+		
+		// find the position
+		int index = topicCounts.size();
+		int value = -1;
+		for(int ii = 0; ii < topicCounts.size(); ii++) {
+			int[] tmp = topicCounts.get(ii);
+			if(tmp[0] == topic) {
+				value = tmp[1];
+				index = ii;
+				break;
+			}
+		}
+		
+		// adjust the value and update or insert
+		if (value == -1) {
+			value = putvalue;
+			int[] newpair = {topic, value};
+			topicCounts.add(newpair);
+		} else {
+			value += adjustvalue;
+			int[] current = topicCounts.get(index);
+			current[1] = value;
+		}
+		
+		// bubble to left
+		for(int ii = index-1; ii >= 0; ii--) {
+			int[] left = topicCounts.get(ii);
+			int[] current = topicCounts.get(ii+1);
+			if(value > left[1]) {
+				current[0] = left[0];
+				current[1] = left[1];
+			} else {
+				current[0] = topic;
+				current[1] = value;
+				break;
+			}
+		}
+		
+		// bubble to right
+		for(int ii = index + 1; ii < topicCounts.size(); ii++) {
+			int[] right = topicCounts.get(ii);
+			int[] current = topicCounts.get(ii-1);
+			if(current[1] < right[1]) {
+				current[0] = right[0];
+				current[1] = right[1];
+			} else {
+				current[0] = topic;
+				current[1] = value;
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -185,7 +272,7 @@ public abstract class TreeTopicSampler {
 
 			// *** remained problem: keep topicCounts sorted
 			TIntArrayList tokens = new TIntArrayList(original_tokens.getLength());
-			TIntIntHashMap topicCounts = new TIntIntHashMap ();			
+			ArrayList<int[]> topicCounts = new ArrayList<int[]> ();			
 			TIntArrayList topics = new TIntArrayList(original_tokens.getLength());
 			TIntArrayList paths = new TIntArrayList(original_tokens.getLength());
 			
@@ -206,7 +293,8 @@ public abstract class TreeTopicSampler {
 				tokens.add(token);
 				topics.add(topic);
 				paths.add(path);
-				topicCounts.adjustOrPutValue(topic, 1, 1);
+				//topicCounts.adjustOrPutValue(topic, 1, 1);
+				this.updateTopicCounts(topicCounts, topic, 1, 1);
 				this.topics.changeCountOnly(topic, token, path, 1);
 			}
 			
@@ -215,6 +303,194 @@ public abstract class TreeTopicSampler {
 		}
 		states.close();
 	}
+	
+	/**
+	 * This function clears the topic and path assignments for some words:
+	 * (1) term option: only clears the topic and path for constraint words;
+	 * (2) doc option: clears the topic and path for documents which contain 
+	 *     at least one of the constraint words.
+	 */
+	public void clearTopicAssignments(String option, String consFile) {
+		this.loadConstraints(consFile);
+		if (this.cons == null || this.cons.size() <= 0) {
+			return;
+		}
+		
+		for(int dd = 0; dd < this.data.size(); dd++) {
+			DocData doc = this.data.get(dd);
+			Boolean flag = false;
+			for(int ii = 0; ii < doc.tokens.size(); ii++) {
+				int word = doc.tokens.get(ii);
+				if(this.cons.contains(word)) {
+					if (option.equals("term")) {
+						int topic = doc.topics.get(ii);
+						int path = doc.paths.get(ii);
+						// change the count for count and node_count in TopicTreeWalk
+						this.topics.changeCountOnly(topic, word, path, -1);
+						doc.topics.set(ii, -1);
+						doc.paths.set(ii, -1);
+						//myAssert(doc.topicCounts.get(topic) >= 1, "clear topic assignments problem");
+						//doc.topicCounts.adjustValue(topic, -1);
+						this.updateTopicCounts(doc.topicCounts, topic, -1, 0);
+					} else if (option.equals("doc")) {
+						flag = true;
+						break;
+					}
+				}
+			}
+			if (flag) {
+				for(int ii = 0; ii < doc.tokens.size(); ii++) {
+					int word = doc.tokens.get(ii);
+					int topic = doc.topics.get(ii);
+					int path = doc.paths.get(ii);
+					this.topics.changeCountOnly(topic, word, path, -1);
+					doc.topics.set(ii, -1);
+					doc.paths.set(ii, -1);
+				}
+				doc.topicCounts.clear();
+			}
+		}
+	}
+	
+	/**
+	 * This function defines how to change a topic during the sampling process.
+	 * It handles the case where both new_topic and old_topic are "-1" (empty topic).
+	 */
+	public void changeTopic(int doc, int index, int word, int new_topic, int new_path) {
+		DocData current_doc = this.data.get(doc);
+		int old_topic = current_doc.topics.get(index);
+		int old_path = current_doc.paths.get(index);
+		
+		if (old_topic != -1) {
+			myAssert((new_topic == -1 && new_path == -1), "old_topic != -1 but new_topic != -1");
+			this.topics.changeCount(old_topic, word, old_path, -1);
+			//myAssert(current_doc.topicCounts.get(old_topic) > 0, "Something wrong in changTopic");
+			//current_doc.topicCounts.adjustValue(old_topic, -1);
+			this.updateTopicCounts(current_doc.topicCounts, old_topic, -1, 0);
+			current_doc.topics.set(index, -1);
+			current_doc.paths.set(index, -1);
+		}
+		
+		if (new_topic != -1) {
+			myAssert((old_topic == -1 && old_path == -1), "new_topic != -1 but old_topic != -1");
+			this.topics.changeCount(new_topic, word, new_path, 1);
+			//current_doc.topicCounts.adjustOrPutValue(new_topic, 1, 1);
+			this.updateTopicCounts(current_doc.topicCounts, new_topic, 1, 1);
+			current_doc.topics.set(index, new_topic);
+			current_doc.paths.set(index, new_path);
+		}
+	}
+	
+	/**
+	 * The function computes the document likelihood.
+	 */
+	public double docLHood() {
+		int docNum = this.data.size();
+		
+		double val = 0.0;
+		val += Dirichlet.logGamma(this.alphaSum) * docNum;
+		double tmp = 0.0;
+		for (int tt = 0; tt < this.numTopics; tt++) {
+			tmp += Dirichlet.logGamma(this.alpha[tt]);
+		}
+		val -= tmp * docNum;
+		for (int dd = 0; dd < docNum; dd++) {
+			DocData doc = this.data.get(dd);
+		
+			int[] tmpTopics = new int[this.numTopics];
+			for(int ii = 0; ii < this.numTopics; ii++) {
+				tmpTopics[ii] = 0;
+			}
+			for(int ii = 0; ii < doc.topicCounts.size(); ii++) {
+				int[] current = doc.topicCounts.get(ii);
+				int tt = current[0];
+				tmpTopics[tt] = current[1];
+			}
+			for(int tt = 0; tt < tmpTopics.length; tt++) {
+				val += Dirichlet.logGamma(this.alpha[tt] + tmpTopics[tt]);
+			}
+			
+			val -= Dirichlet.logGamma(this.alphaSum + doc.topics.size());
+		}
+		return val;
+	}
+	
+	/**
+	 * Prints the index, original document dir, topic counts for each document.
+	 */
+	public void printDocumentTopics (File file) throws IOException {
+		PrintStream out = new PrintStream (file);
+		
+		for (int dd = 0; dd < this.data.size(); dd++) {
+			DocData doc = this.data.get(dd);
+			String tmp = dd + "\t" + doc.docName + "\t";
+			for (int ii = 0; ii < doc.topicCounts.size(); ii++) {
+				int[] current = doc.topicCounts.get(ii);
+				tmp += current[0] + ":" + current[1] + "\t";
+			}
+//			for (int tt : doc.topicCounts.keys()) {
+//				int count = doc.topicCounts.get(tt);
+//				tmp += tt + ":" + count + "\t";
+//			}
+			out.print(tmp + "\n");
+		}
+		out.close();
+	}
+	
+	////////////////////////////////////////
+	/**
+	 * This function defines the sampling process, computes the likelihood and running time,
+	 * and specifies when to save the states files.
+	 */
+	public void estimate(int numIterations, String outputFolder, int outputInterval, int topWords) {
+		// update parameters
+		this.topics.updateParams();
+//		for (int dd = 0; dd < this.data.size(); dd++) {
+//			DocData doc = this.data.get(dd);
+//			System.out.println("Doc " + dd);
+//			for (int ii = 0; ii < doc.topicCounts.size(); ii++) {
+//				int [] current = doc.topicCounts.get(ii);
+//				System.out.println(current[0] + " " + current[1]);
+//			}
+//			
+//		}
+		
+		for (int ii = this.startIter; ii <= numIterations; ii++) {
+			long starttime = System.currentTimeMillis();
+			//System.out.println("Iter " + ii);
+			for (int dd = 0; dd < this.data.size(); dd++) {
+				this.sampleDoc(dd);
+				if (dd > 0 && dd % 1000 == 0) {
+					System.out.println("Sampled " + dd + " documents.");
+				}
+			}
+			double lhood = this.lhood();
+			this.lhood.add(lhood);
+			double totaltime = (double)(System.currentTimeMillis() - starttime) / 1000;
+			this.iterTime.add(totaltime);
+			
+			String tmp = "Iteration " + ii;
+			tmp += " likelihood " + lhood;
+			tmp += " totaltime " + totaltime;
+			System.out.println(tmp);
+			
+			if ((ii > 0 && ii % outputInterval == 0) || ii == numIterations) {
+				try {
+					this.report(outputFolder, topWords);
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+		}
+	}
+		
+	/**
+	 * This function returns the likelihood.
+	 */
+	public double lhood() {
+		return this.docLHood() + this.topics.topicLHood();
+	}
+	
 	
 	/**
 	 * Resume lhood and iterTime from the saved lhood file. 
@@ -255,146 +531,6 @@ public abstract class TreeTopicSampler {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-	}
-	
-	/**
-	 * This function clears the topic and path assignments for some words:
-	 * (1) term option: only clears the topic and path for constraint words;
-	 * (2) doc option: clears the topic and path for documents which contain 
-	 *     at least one of the constraint words.
-	 */
-	public void clearTopicAssignments(String option, String consFile) {
-		this.loadConstraints(consFile);
-		if (this.cons == null || this.cons.size() <= 0) {
-			return;
-		}
-		
-		for(int dd = 0; dd < this.data.size(); dd++) {
-			DocData doc = this.data.get(dd);
-			Boolean flag = false;
-			for(int ii = 0; ii < doc.tokens.size(); ii++) {
-				int word = doc.tokens.get(ii);
-				if(this.cons.contains(word)) {
-					if (option.equals("term")) {
-						int topic = doc.topics.get(ii);
-						int path = doc.paths.get(ii);
-						// change the count for count and node_count in TopicTreeWalk
-						this.topics.changeCountOnly(topic, word, path, -1);
-						doc.topics.set(ii, -1);
-						doc.paths.set(ii, -1);
-						myAssert(doc.topicCounts.get(topic) >= 1, "clear topic assignments problem");
-						doc.topicCounts.adjustValue(topic, -1);
-					} else if (option.equals("doc")) {
-						flag = true;
-						break;
-					}
-				}
-			}
-			if (flag) {
-				for(int ii = 0; ii < doc.tokens.size(); ii++) {
-					int word = doc.tokens.get(ii);
-					int topic = doc.topics.get(ii);
-					int path = doc.paths.get(ii);
-					this.topics.changeCountOnly(topic, word, path, -1);
-					doc.topics.set(ii, -1);
-					doc.paths.set(ii, -1);
-				}
-				doc.topicCounts.clear();
-			}
-		}
-	}
-	
-	/**
-	 * This function defines how to change a topic during the sampling process.
-	 * It handles the case where both new_topic and old_topic are "-1" (empty topic).
-	 */
-	public void changeTopic(int doc, int index, int word, int new_topic, int new_path) {
-		DocData current_doc = this.data.get(doc);
-		int old_topic = current_doc.topics.get(index);
-		int old_path = current_doc.paths.get(index);
-		
-		if (old_topic != -1) {
-			myAssert((new_topic == -1 && new_path == -1), "old_topic != -1 but new_topic != -1");
-			this.topics.changeCount(old_topic, word, old_path, -1);
-			myAssert(current_doc.topicCounts.get(old_topic) > 0, "Something wrong in changTopic");
-			current_doc.topicCounts.adjustValue(old_topic, -1);
-			current_doc.topics.set(index, -1);
-			current_doc.paths.set(index, -1);
-		}
-		
-		if (new_topic != -1) {
-			myAssert((old_topic == -1 && old_path == -1), "new_topic != -1 but old_topic != -1");
-			this.topics.changeCount(new_topic, word, new_path, 1);
-			current_doc.topicCounts.adjustOrPutValue(new_topic, 1, 1);
-			current_doc.topics.set(index, new_topic);
-			current_doc.paths.set(index, new_path);
-		}
-	}
-	
-	/**
-	 * This function defines the sampling process, computes the likelihood and running time,
-	 * and specifies when to save the states files.
-	 */
-	public void estimate(int numIterations, String outputFolder, int outputInterval, int topWords) {
-		// update parameters
-		this.topics.updateParams();
-		for (int ii = this.startIter; ii <= numIterations; ii++) {
-			long starttime = System.currentTimeMillis();
-			//System.out.println("Iter " + ii);
-			for (int dd = 0; dd < this.data.size(); dd++) {
-				this.sampleDoc(dd);
-				if (dd > 0 && dd % 1000 == 0) {
-					System.out.println("Sampled " + dd + " documents.");
-				}
-			}
-			double lhood = this.lhood();
-			this.lhood.add(lhood);
-			double totaltime = (double)(System.currentTimeMillis() - starttime) / 1000;
-			this.iterTime.add(totaltime);
-			
-			String tmp = "Iteration " + ii;
-			tmp += " likelihood " + lhood;
-			tmp += " totaltime " + totaltime;
-			System.out.println(tmp);
-			
-			if ((ii > 0 && ii % outputInterval == 0) || ii == numIterations) {
-				try {
-					this.report(outputFolder, topWords);
-				} catch (IOException e) {
-					System.out.println(e.getMessage());
-				}
-			}
-		}
-	}
-	
-	/**
-	 * The function computes the document likelihood.
-	 */
-	public double docLHood() {
-		int docNum = this.data.size();
-		
-		double val = 0.0;
-		val += Dirichlet.logGamma(this.alphaSum) * docNum;
-		double tmp = 0.0;
-		for (int tt = 0; tt < this.numTopics; tt++) {
-			tmp += Dirichlet.logGamma(this.alpha[tt]);
-		}
-		val -= tmp * docNum;
-		for (int dd = 0; dd < docNum; dd++) {
-			DocData doc = this.data.get(dd);
-			for (int tt = 0; tt < this.numTopics; tt++) {
-				val += Dirichlet.logGamma(this.alpha[tt] + doc.topicCounts.get(tt));
-			}
-			val -= Dirichlet.logGamma(this.alphaSum + doc.topics.size());
-		}
-		return val;
-	}
-	
-	/**
-	 * This function returns the likelihood.
-	 */
-	public double lhood() {
-		return this.docLHood() + this.topics.topicLHood();
 	}
 	
 	/**
@@ -475,24 +611,6 @@ public abstract class TreeTopicSampler {
 	}
 	
 	/**
-	 * Prints the index, original document dir, topic counts for each document.
-	 */
-	public void printDocumentTopics (File file) throws IOException {
-		PrintStream out = new PrintStream (file);
-		
-		for (int dd = 0; dd < this.data.size(); dd++) {
-			DocData doc = this.data.get(dd);
-			String tmp = dd + "\t" + doc.docName + "\t";
-			for (int tt : doc.topicCounts.keys()) {
-				int count = doc.topicCounts.get(tt);
-				tmp += tt + ":" + count + "\t";
-			}
-			out.print(tmp + "\n");
-		}
-		out.close();
-	}
-	
-	/**
 	 * Prints the topic and path of each word for all documents.
 	 */
 	public void printState (File file) throws IOException {
@@ -527,11 +645,8 @@ public abstract class TreeTopicSampler {
 		out.close();
 	}
 	
-	/**
-	 * Load vocab
-	 */
 	public void loadVocab(String vocabFile) {
-				
+		
 		try {
 			FileInputStream infstream = new FileInputStream(vocabFile);
 			DataInputStream in = new DataInputStream(infstream);

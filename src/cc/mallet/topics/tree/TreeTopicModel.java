@@ -11,6 +11,7 @@ import gnu.trove.TIntObjectIterator;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TreeMap;
 
 import cc.mallet.types.Dirichlet;
 
@@ -38,6 +39,8 @@ public abstract class TreeTopicModel {
 	//HIntIntObjectHashMap<Double> priorPath;
 	
 	TIntObjectHashMap<HIntIntIntHashMap> nonZeroPaths;
+	TIntObjectHashMap<TreeMap<Integer, Integer>> nonZeroPathsSorted;
+	TIntObjectHashMap<ArrayList<int[]>> nonZeroPathsBubbleSorted;
 	TIntObjectHashMap<TopicTreeWalk> traversals;
 	
 	HIntIntDoubleHashMap normalizer;
@@ -61,6 +64,8 @@ public abstract class TreeTopicModel {
 		this.nodeToPath = new TIntObjectHashMap<TIntArrayList> ();
 		
 		this.nonZeroPaths = new TIntObjectHashMap<HIntIntIntHashMap> ();
+		this.nonZeroPathsSorted = new TIntObjectHashMap<TreeMap<Integer, Integer>> ();
+		this.nonZeroPathsBubbleSorted = new TIntObjectHashMap<ArrayList<int[]>> ();
 		this.traversals = new TIntObjectHashMap<TopicTreeWalk> ();
 	}
 	
@@ -322,10 +327,25 @@ public abstract class TreeTopicModel {
 		return 0;
 	}
 	
+	public double computeTopicTermTest(double[] alpha, TIntIntHashMap local_topic_counts, int word, ArrayList<double[]> dict){
+		return 0;
+	}
+	
+	public double computeTermTopicBetaSort(ArrayList<int[]> topicCounts, int word) {
+		return 0;
+	}
+	
+	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict){
+		return 0;
+	}
+	
 	// shared methods
 	abstract double getNormalizer(int topic, int path);
 	abstract void updateParams();
 	abstract void changeCount(int topic, int word, int path_index, int delta);
-	abstract double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, HIntIntDoubleHashMap dict);
+	abstract double computeTopicTerm(double[] alpha, TIntIntHashMap local_topic_counts, int word, ArrayList<double[]> dict);
+
+
+
 
 }

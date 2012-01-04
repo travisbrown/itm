@@ -4,6 +4,7 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import cc.mallet.topics.tree.TreeTopicSampler.DocData;
 import cc.mallet.types.Alphabet;
@@ -20,10 +21,10 @@ public class testNaive extends TestCase{
 	
 	public static TreeTopicSamplerNaive Initialize() {
 		
-		String inputFile = "../input/toy-topic-input.mallet";
-		String treeFiles = "../toy/toy.wn.*";
-		String hyperFile = "../toy/tree_hyperparams";
-		String vocabFile = "../toy/toy.voc";		
+		String inputFile = "input/toy/toy-topic-input.mallet";
+		String treeFiles = "input/toy/toy.wn.*";
+		String hyperFile = "input/toy/tree_hyperparams";
+		String vocabFile = "input/toy/toy.voc";		
 		int numTopics = 3;
 		double alpha_sum = 0.3;
 		int randomSeed = 0;
@@ -134,19 +135,16 @@ public class testNaive extends TestCase{
 				
 				//topicModel.changeTopic(dd, index, word, -1, -1);
 				
-				HIntIntDoubleHashMap topic_term_score = new HIntIntDoubleHashMap();
+				ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
 				double norm = topicModel.topics.computeTopicTerm(topicModel.alpha, doc.topicCounts, word, topic_term_score);
 				System.out.println(norm);
 				
-				String tmp = "";
-				int[] topic_set = topic_term_score.getKey1Set();
-				for (int tt : topic_set) {
-					int[] path_set = topic_term_score.get(tt).keys();
-					for (int pp : path_set) {
-						double val = topic_term_score.get(tt, pp);
-						tmp += val + " ";
-						System.out.println(tt + " " + pp + " " + val);
-					}
+				for(int jj = 0; jj < topic_term_score.size(); jj++) {
+					double[] tmp = topic_term_score.get(jj);
+					int tt = (int) tmp[0];
+					int pp = (int) tmp[1];
+					double val = tmp[2];
+					System.out.println(tt + " " + pp + " " + val);
 				}
 			}
 		}
