@@ -347,9 +347,10 @@ public abstract class TreeTopicSampler {
 					System.out.println("Sampled " + dd + " documents.");
 				}
 			}
+			
+			double totaltime = (double)(System.currentTimeMillis() - starttime) / 1000;
 			double lhood = this.lhood();
 			this.lhood.add(lhood);
-			double totaltime = (double)(System.currentTimeMillis() - starttime) / 1000;
 			this.iterTime.add(totaltime);
 			
 			String tmp = "Iteration " + ii;
