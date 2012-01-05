@@ -24,10 +24,23 @@ import cc.mallet.util.Randoms;
  */
 public class TreeTopicSamplerFast extends TreeTopicSampler {
 	
-	public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed) {
+    public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed, int bubble) {
 		super(numberOfTopics, alphaSum, seed);
-		this.topics = new TreeTopicModelFast(this.numTopics, this.random);
-		//this.topics = new TreeTopicModelFastSort(this.numTopics, this.random);
+		if (bubble == -2) {
+		    this.topics = new TreeTopicModelFastSort(this.numTopics, this.random);
+		} else if (bubble == -1) {
+		    this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
+		} else if (bubble == 0) {
+		    this.topics = new TreeTopicModelFastBubbleSort0(this.numTopics, this.random);
+		} else if (bubble == 1) {
+		    this.topics = new TreeTopicModelFastBubbleSort1(this.numTopics, this.random);
+		} else if (bubble == 2) {
+		    this.topics = new TreeTopicModelFastBubbleSort2(this.numTopics, this.random);
+		} else if (bubble == 3) {
+		    this.topics = new TreeTopicModelFastBubbleSort3(this.numTopics, this.random);
+		} else {
+		    this.topics = new TreeTopicModelFast(this.numTopics, this.random);
+		}
 		//this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
 	}
 	

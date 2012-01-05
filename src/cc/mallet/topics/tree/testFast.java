@@ -41,7 +41,7 @@ public class testFast extends TestCase{
 		System.out.println ("Data loaded.");
 		
 		TreeTopicSamplerFast topicModel = null;
-		topicModel = new TreeTopicSamplerFast(numTopics, alpha_sum, randomSeed);
+		topicModel = new TreeTopicSamplerFast(numTopics, alpha_sum, randomSeed, -3);
 		
 		topicModel.initialize(treeFiles, hyperFile, vocabFile);
 		topicModel.addInstances(ilist);

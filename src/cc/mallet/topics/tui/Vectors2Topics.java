@@ -106,9 +106,13 @@ public class Vectors2Topics {
 	(Vectors2Topics.class, "clear-type", "TYPENAME", true, null,
 	 "Two possible types: doc, term.", null);
 	
-	static CommandOption.Boolean genVocab = new CommandOption.Boolean
-	(Vectors2Topics.class, "generate-vocab", "true|false", false, false,
-	 "Generate vocab after mallet preprocessing.", null);	
+        static CommandOption.Boolean genVocab = new CommandOption.Boolean
+	    (Vectors2Topics.class, "generate-vocab", "true|false", false, false,
+	     "Generate vocab after mallet preprocessing.", null);
+	
+        static CommandOption.Integer bubble = new CommandOption.Integer
+	(Vectors2Topics.class, "bubble", "INTEGER", true, -1,
+	 "bubble sort options: -2:treemap, -1:bubble, 0:bubble0, 1:bubble1, 2:bubbl2, 3:bubble3, others:fast.", null);	
 	
 	public static void main (String[] args) throws java.io.IOException
 	{
@@ -130,7 +134,7 @@ public class Vectors2Topics {
 							numTopics.value, alpha.value, randomSeed.value);
 				} else if (modelType.value.equals("fast")){
 					topicModel = new TreeTopicSamplerFast(
-							numTopics.value, alpha.value, randomSeed.value);
+							numTopics.value, alpha.value, randomSeed.value, bubble.value);
 				} else if (modelType.value.equals("fast-est")) {
 					topicModel = new TreeTopicSamplerFastEst(
 							numTopics.value, alpha.value, randomSeed.value);

@@ -13,7 +13,7 @@ import java.util.Random;
  * Author: Yuening Hu
  */
 //public class TreeTopicModelFastEst extends TreeTopicModelFast {
-public class TreeTopicModelFastEst extends TreeTopicModelFastBubbleSort {
+public class TreeTopicModelFastEst extends TreeTopicModelFastBubbleSort0 {
 	public TreeTopicModelFastEst(int numTopics, Random random) {
 		super(numTopics, random);
 		this.smoothingEst = new TIntDoubleHashMap();
