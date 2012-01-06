@@ -129,8 +129,8 @@ public class Vectors2Topics {
 			if (genVocab.value) {
 				GenerateVocab.genVocab(ilist, vocabFile.value);
 			} else {
-				TreeTopicSampler topicModel = null;
-				if (modelType.value.equals("naive")) {
+			        TreeTopicSampler topicModel = null;
+			        if (modelType.value.equals("naive")) {
 					topicModel = new TreeTopicSamplerNaive(
 							numTopics.value, alpha.value, randomSeed.value);
 				} else if (modelType.value.equals("fast")){
