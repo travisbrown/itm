@@ -20,6 +20,7 @@ import cc.mallet.topics.tree.PriorTree;
 import cc.mallet.topics.tree.TreeTopicSampler;
 import cc.mallet.topics.tree.TreeTopicSamplerFast;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEst;
+import cc.mallet.topics.tree.TreeTopicSamplerFastEstSort;
 import cc.mallet.topics.tree.TreeTopicSamplerFastSort;
 import cc.mallet.topics.tree.TreeTopicSamplerNaive;
 import cc.mallet.topics.tree.TreeTopicSamplerSort;
@@ -128,24 +129,26 @@ public class Vectors2Topics {
 			if (genVocab.value) {
 				GenerateVocab.genVocab(ilist, vocabFile.value);
 			} else {
-//				TreeTopicSampler topicModel = null;
-//				if (modelType.value.equals("naive")) {
-//					topicModel = new TreeTopicSamplerNaive(
-//							numTopics.value, alpha.value, randomSeed.value);
-//				} else if (modelType.value.equals("fast")){
-//					topicModel = new TreeTopicSamplerFast(
-//							numTopics.value, alpha.value, randomSeed.value, bubbleOption.value);
-//				} else if (modelType.value.equals("fast-est")) {
-//					topicModel = new TreeTopicSamplerFastEst(
-//							numTopics.value, alpha.value, randomSeed.value);
-//				} else {
-//					System.out.println("model type wrong! please use " +
-//							"'naive' 'fast' or 'fast-est'!");
-//					System.exit(0);
-//				}
+				TreeTopicSampler topicModel = null;
+				if (modelType.value.equals("naive")) {
+					topicModel = new TreeTopicSamplerNaive(
+							numTopics.value, alpha.value, randomSeed.value);
+				} else if (modelType.value.equals("fast")){
+					topicModel = new TreeTopicSamplerFast(
+							numTopics.value, alpha.value, randomSeed.value, bubbleOption.value);
+				} else if (modelType.value.equals("fast-est")) {
+					topicModel = new TreeTopicSamplerFastEst(
+							numTopics.value, alpha.value, randomSeed.value);
+				} else {
+					System.out.println("model type wrong! please use " +
+							"'naive' 'fast' or 'fast-est'!");
+					System.exit(0);
+				}
 				
-				TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
-						numTopics.value, alpha.value, randomSeed.value);
+				//TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
+				//		numTopics.value, alpha.value, randomSeed.value);
+				//TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastEstSort(
+				//	numTopics.value, alpha.value, randomSeed.value);
 				
 				// load tree and vocab
 				topicModel.initialize(treeFiles.value, hyperFile.value, vocabFile.value);
