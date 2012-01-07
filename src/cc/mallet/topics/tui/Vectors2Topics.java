@@ -18,7 +18,7 @@ import cc.mallet.topics.*;
 import cc.mallet.topics.tree.GenerateVocab;
 import cc.mallet.topics.tree.PriorTree;
 import cc.mallet.topics.tree.TopicSampler;
-import cc.mallet.topics.tree.TreeTopicSampler;
+import cc.mallet.topics.tree.TreeTopicSamplerHash;
 import cc.mallet.topics.tree.TreeTopicSamplerFast;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEst;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEstSort;
@@ -130,9 +130,9 @@ public class Vectors2Topics {
 			if (genVocab.value) {
 				GenerateVocab.genVocab(ilist, vocabFile.value);
 			} else {
-//		        TreeTopicSampler topicModel = null;
+//		        TreeTopicSamplerHash topicModel = null;
 //		        if (modelType.value.equals("naive")) {
-//		        	topicModel = new TreeTopicSamplerNaive(
+//		        	topicModel = new TreeTopicSamplerNaive( 
 //						numTopics.value, alpha.value, randomSeed.value);
 //				} else if (modelType.value.equals("fast")){
 //					topicModel = new TreeTopicSamplerFast(
@@ -146,10 +146,10 @@ public class Vectors2Topics {
 //					System.exit(0);
 //				}
 				
+				TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastEstSort(
+						numTopics.value, alpha.value, randomSeed.value);
 				//TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
 				//		numTopics.value, alpha.value, randomSeed.value);
-				TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
-						numTopics.value, alpha.value, randomSeed.value);
 				//TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastEstSort(
 				//	numTopics.value, alpha.value, randomSeed.value);
 				

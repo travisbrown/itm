@@ -39,7 +39,7 @@ import cc.mallet.util.Randoms;
  * It calls the naive tree topic model.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerNaive extends TreeTopicSampler {
+public class TreeTopicSamplerNaive extends TreeTopicSamplerHash {
 		
 	public TreeTopicSamplerNaive (int numberOfTopics, double alphaSum) {
 		this (numberOfTopics, alphaSum, 0);

@@ -88,6 +88,61 @@ public class TreeTopicModelFastBubbleSort0 extends TreeTopicModelFast {
 
 	}
 	
+	private void addOrUpdateValueold(int topic, int path, int word, int newvalue, boolean flag) {
+		ArrayList<int[]> sorted = this.nonZeroPathsBubbleSorted.get(word);
+		int key = (topic << TOPIC_BITS) + path;
+		//remove the old value
+		int oldindex = sorted.size();
+		int oldvalue = -1;
+		for(int ii = 0; ii < sorted.size(); ii++) {
+			int[] tmp = sorted.get(ii);
+			if(tmp[0] == key) {
+				oldvalue = tmp[1];
+				sorted.remove(ii);
+				break;
+			}
+		}
+		if(oldindex > sorted.size()) {
+			oldindex--;
+		}
+		
+		// flag is true, increase value, else just update value
+		int value = 0;
+		if(flag) {
+			value = oldvalue + newvalue;
+		} else {
+			value = newvalue;
+		}
+		
+		//add the new value
+		if (value > 0) {
+			int index;
+			if (value > oldvalue) {
+				index = 0;
+				for(int ii = oldindex - 1; ii >= 0; ii--) {
+					//System.out.println(ii + " " + oldindex + " " + sorted.size());
+					int[] tmp = sorted.get(ii);
+					if(value <= tmp[1]) {
+						index = ii;
+						break;
+					}
+				}
+			} else {
+				index = sorted.size();
+				for(int ii = oldindex; ii < sorted.size(); ii++) {
+					int[] tmp = sorted.get(ii);
+					if(value >= tmp[1]) {
+						index = ii;
+						break;
+					}
+				}
+			}
+
+			int[] newpair = {key, value};
+			sorted.add(index, newpair);
+		}
+	}
+	
 	private void addOrUpdateValue(int topic, int path, int word, int newvalue, boolean flag) {
 		ArrayList<int[]> sorted = this.nonZeroPathsBubbleSorted.get(word);
 		int key = (topic << TOPIC_BITS) + path;

@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cc.mallet.topics.tree.TreeTopicSampler.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
 import cc.mallet.util.Randoms;
 
 /**
@@ -22,7 +22,7 @@ import cc.mallet.util.Randoms;
  * (3) Topic counts for each documents are ranked.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerFast extends TreeTopicSampler {
+public class TreeTopicSamplerFast extends TreeTopicSamplerHash {
 	
     public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed, int bubble) {
 		super(numberOfTopics, alphaSum, seed);

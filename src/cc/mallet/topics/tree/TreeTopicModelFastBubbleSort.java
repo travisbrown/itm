@@ -301,4 +301,42 @@ public class TreeTopicModelFastBubbleSort extends TreeTopicModelFast {
 		
 		return norm;
 	}
+	
+	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
+		double norm = 0.0;
+		ArrayList<int[]> nonzeros = this.nonZeroPathsBubbleSorted.get(word);
+		
+		
+		int[] tmpTopics = new int[this.numTopics];
+		for(int jj = 0; jj < this.numTopics; jj++) {
+			tmpTopics[jj] = 0;
+		}
+		for(int jj = 0; jj < local_topic_counts.size(); jj++) {
+			int[] current = local_topic_counts.get(jj);
+			int tt = current[0];
+			tmpTopics[tt] = current[1];
+		}
+		
+		// Notice only the nonzero paths are considered
+		for(int ii = 0; ii < nonzeros.size(); ii++) {
+			int[] tmp = nonzeros.get(ii);
+			int tt = tmp[0];
+			int pp = tmp[1];
+
+			double topic_alpha = alpha[tt];
+			int topic_count = tmpTopics[tt];
+
+			double val = this.getObservation(tt, word, pp);
+			val *= (topic_alpha + topic_count);
+			val /= this.getNormalizer(tt, pp);
+
+			//System.out.println(tt + " " + pp + " " + tmp[2] + " " + val);
+			
+			double[] result = {tt, pp, val};
+			dict.add(result);
+			
+			norm += val;
+		}
+		return norm;
+	}
 }

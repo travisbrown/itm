@@ -139,7 +139,7 @@ public class TreeTopicModelFastSort extends TreeTopicModelFast {
 		ValueComparator comparator = (ValueComparator)treemap.comparator();
 		HashMap<Integer, Integer> map = comparator.map;
 		if (map.containsKey(key)) {
-			TreeTopicSampler.myAssert(treemap.containsKey(key), "Error!");
+			TreeTopicSamplerHash.myAssert(treemap.containsKey(key), "Error!");
 			//System.out.println(map.get(key) + " " + key);
 			int value = treemap.get(key);
 			

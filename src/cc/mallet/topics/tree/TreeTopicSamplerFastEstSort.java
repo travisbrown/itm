@@ -2,7 +2,7 @@ package cc.mallet.topics.tree;
 
 import java.util.ArrayList;
 
-import cc.mallet.topics.tree.TreeTopicSampler.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
 
 /**
  * This class improves the fast sampler based on estimation of smoothing.
