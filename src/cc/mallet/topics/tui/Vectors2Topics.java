@@ -18,13 +18,13 @@ import cc.mallet.topics.*;
 import cc.mallet.topics.tree.GenerateVocab;
 import cc.mallet.topics.tree.PriorTree;
 import cc.mallet.topics.tree.TopicSampler;
-import cc.mallet.topics.tree.TreeTopicSamplerHash;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD;
 import cc.mallet.topics.tree.TreeTopicSamplerFast;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEst;
 import cc.mallet.topics.tree.TreeTopicSamplerFastEstSort;
 import cc.mallet.topics.tree.TreeTopicSamplerFastSort;
 import cc.mallet.topics.tree.TreeTopicSamplerNaive;
-import cc.mallet.topics.tree.TreeTopicSamplerSort;
+import cc.mallet.topics.tree.TreeTopicSamplerSortD;
 
 import java.io.*;
 
@@ -146,7 +146,7 @@ public class Vectors2Topics {
 //					System.exit(0);
 //				}
 				
-				TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastEstSort(
+				TreeTopicSamplerSortD topicModel = new TreeTopicSamplerFastEstSort(
 						numTopics.value, alpha.value, randomSeed.value);
 				//TreeTopicSamplerSort topicModel = new TreeTopicSamplerFastSort(
 				//		numTopics.value, alpha.value, randomSeed.value);

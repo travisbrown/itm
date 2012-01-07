@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 import cc.mallet.types.Dirichlet;
 import cc.mallet.types.FeatureSequence;
 import cc.mallet.types.Instance;

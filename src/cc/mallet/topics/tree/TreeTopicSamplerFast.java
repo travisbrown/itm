@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 import cc.mallet.util.Randoms;
 
 /**
@@ -22,7 +22,7 @@ import cc.mallet.util.Randoms;
  * (3) Topic counts for each documents are ranked.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerFast extends TreeTopicSamplerHash {
+public class TreeTopicSamplerFast extends TreeTopicSamplerHashD {
 	
     public TreeTopicSamplerFast (int numberOfTopics, double alphaSum, int seed, int bubble) {
 		super(numberOfTopics, alphaSum, seed);
@@ -33,16 +33,9 @@ public class TreeTopicSamplerFast extends TreeTopicSamplerHash {
 		    this.topics = new TreeTopicModelFastBubbleSort1(this.numTopics, this.random);
 		} else if (bubble == 2) {
 		    this.topics = new TreeTopicModelFastBubbleSort2(this.numTopics, this.random);
-		} else if (bubble == 3) {
-		    this.topics = new TreeTopicModelFastBubbleSort3(this.numTopics, this.random);
-		} else if (bubble == 4) {
-			this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
-		} else if (bubble == 5) {
-			this.topics = new TreeTopicModelFastSort(this.numTopics, this.random);
 		} else {
 		    this.topics = new TreeTopicModelFast(this.numTopics, this.random);
 		}
-		//this.topics = new TreeTopicModelFastBubbleSort(this.numTopics, this.random);
 	}
 	
 	/**

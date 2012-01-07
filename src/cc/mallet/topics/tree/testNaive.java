@@ -6,7 +6,7 @@ import gnu.trove.TIntIntHashMap;
 import java.io.File;
 import java.util.ArrayList;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureSequence;
 import cc.mallet.types.Instance;

@@ -2,7 +2,7 @@ package cc.mallet.topics.tree;
 
 import java.util.ArrayList;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntDoubleHashMap;
 
@@ -13,7 +13,7 @@ import gnu.trove.TIntDoubleHashMap;
  * Only if the smoothing bin is hit, the actual smoothing is computed and resampled.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerFastEst extends TreeTopicSamplerHash{
+public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 	
 	public TreeTopicSamplerFastEst (int numberOfTopics, double alphaSum, int seed) {
 		super(numberOfTopics, alphaSum, seed);

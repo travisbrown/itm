@@ -2,7 +2,7 @@ package cc.mallet.topics.tree;
 
 import java.util.ArrayList;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 
 /**
  * This class improves the fast sampler based on estimation of smoothing.
@@ -11,7 +11,7 @@ import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
  * Only if the smoothing bin is hit, the actual smoothing is computed and resampled.
  * Author: Yuening Hu
  */
-public class TreeTopicSamplerFastEstSort extends TreeTopicSamplerSort{
+public class TreeTopicSamplerFastEstSort extends TreeTopicSamplerSortD{
 
 	public TreeTopicSamplerFastEstSort (int numberOfTopics, double alphaSum, int seed) {
 		super(numberOfTopics, alphaSum, seed);
