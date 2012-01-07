@@ -17,14 +17,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cc.mallet.topics.tree.TreeTopicSamplerHash.DocData;
+import cc.mallet.topics.tree.TreeTopicSamplerHashD.DocData;
 import cc.mallet.types.Dirichlet;
 import cc.mallet.types.FeatureSequence;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import cc.mallet.util.Randoms;
 
-public abstract class TreeTopicSamplerSort {
+public abstract class TreeTopicSamplerSortD {
 	
 	/**
 	 * This class defines the format of a document.
@@ -89,7 +89,7 @@ public abstract class TreeTopicSamplerSort {
 	TIntHashSet cons;
 	ArrayList<DocData> data;
 	
-	public TreeTopicSamplerSort (int numberOfTopics, double alphaSum, int seed) {
+	public TreeTopicSamplerSortD (int numberOfTopics, double alphaSum, int seed) {
 		this.numTopics = numberOfTopics;
 		this.random = new Randoms(seed);
 
