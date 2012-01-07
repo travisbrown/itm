@@ -32,7 +32,7 @@ import cc.mallet.util.Randoms;
  * which might be various for different methods.
  * Author: Yuening Hu
  */
-public abstract class TreeTopicSampler {
+public abstract class TreeTopicSamplerHashD {
 	
 	/**
 	 * This class defines the format of a document.
@@ -95,7 +95,7 @@ public abstract class TreeTopicSampler {
 	TreeTopicModel topics;
 	TIntHashSet cons;
 	
-	public TreeTopicSampler (int numberOfTopics, double alphaSum, int seed) {
+	public TreeTopicSamplerHashD (int numberOfTopics, double alphaSum, int seed) {
 		this.numTopics = numberOfTopics;
 		this.random = new Randoms(seed);
 
