@@ -282,7 +282,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 	/**
 	 * This function computes the topic beta bucket.
 	 */
-	public double computeTermTopicBetaSort(ArrayList<int[]> topic_counts, int word) {
+	public double computeTermTopicBetaSortD(ArrayList<int[]> topic_counts, int word) {
 		double topic_beta = 0.0;
 		int[] paths = this.getWordPathIndexSet(word);
 		for(int ii = 0; ii < topic_counts.size(); ii++) {
@@ -327,7 +327,7 @@ public class TreeTopicModelFast extends TreeTopicModel {
 		return norm;
 	}
 
-	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
+	public double computeTopicTermSortD(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
 		double norm = 0.0;
 		HIntIntIntHashMap nonzeros = this.nonZeroPaths.get(word);
 		

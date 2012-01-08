@@ -39,10 +39,10 @@ public class TreeTopicSamplerFastEstSortD extends TreeTopicSamplerSortD{
 			
 			//double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 			double smoothing_mass_est = this.topics.smoothingEst.get(word);
-			double topic_beta_mass = this.topics.computeTermTopicBetaSort(doc.topicCounts, word);
+			double topic_beta_mass = this.topics.computeTermTopicBetaSortD(doc.topicCounts, word);
 			
 			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
-			double topic_term_mass = this.topics.computeTopicTermSort(this.alpha, doc.topicCounts, word, topic_term_score);
+			double topic_term_mass = this.topics.computeTopicTermSortD(this.alpha, doc.topicCounts, word, topic_term_score);
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();

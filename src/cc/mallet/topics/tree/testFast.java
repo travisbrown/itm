@@ -31,7 +31,7 @@ public class testFast extends TestCase{
 //		String inputFile = "../input/synthetic-topic-input.mallet";
 //		String treeFiles = "../synthetic/synthetic_empty.wn.*";
 //		String hyperFile = "../synthetic/tree_hyperparams";
-//		String vocabFile = "../synthetic/synthetic.voc";		
+//		String vocabFile = "../synthetic/synthetic.voc";
 //		int numTopics = 5;
 //		double alpha_sum = 0.5;
 //		int randomSeed = 0;

@@ -219,7 +219,7 @@ public class TreeTopicModelFastSortT1  extends TreeTopicModelFast {
 		return norm;
 	}
 	
-	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
+	public double computeTopicTermSortD(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict) {
 		double norm = 0.0;
 		ArrayList<int[]> nonzeros = this.nonZeroPathsBubbleSorted.get(word);
 		

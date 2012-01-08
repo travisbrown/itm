@@ -333,11 +333,11 @@ public abstract class TreeTopicModel {
 		return 0;
 	}
 	
-	public double computeTermTopicBetaSort(ArrayList<int[]> topicCounts, int word) {
+	public double computeTermTopicBetaSortD(ArrayList<int[]> topicCounts, int word) {
 		return 0;
 	}
 	
-	public double computeTopicTermSort(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict){
+	public double computeTopicTermSortD(double[] alpha, ArrayList<int[]> local_topic_counts, int word, ArrayList<double[]> dict){
 		return 0;
 	}
 	
