@@ -34,7 +34,7 @@ def sortVocab(infilename, tfidf, frequency, option, outfilename):
   outfile = codecs.open(outfilename, 'w', 'utf-8')
   for ii in vocab:
     for jj in vocab[ii]:
-      outfile.write(u"%i\t%s\t%f\t%i\n" % (ii, jj, tfidf[ii][jj], frequency[ii][jj]))
+      outfile.write(u"%s\t%s\t%f\t%i\n" % (ii, jj, tfidf[ii][jj], frequency[ii][jj]))
   outfile.close()
 
 
