@@ -28,6 +28,8 @@ def sortVocab(infilename, tfidf, frequency, option, outfilename):
     line = line.strip()
     ww = line.split('\t')
     lang = ww[0]
+    if source[lang][ww[1]] == 0:
+      print source[lang][ww[1]], ww[1]
     vocab[lang].inc(ww[1], source[lang][ww[1]])
   infile.close()
 
