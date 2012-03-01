@@ -1,3 +1,4 @@
+from topicmod.util import flags
 from collections import defaultdict
 from nltk import FreqDist
 import codecs
