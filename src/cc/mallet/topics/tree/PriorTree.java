@@ -240,11 +240,12 @@ public class PriorTree {
         
         this.setPrior();
         
-        System.out.println("**************************");
+        //System.out.println("**************************");
         // check the word paths
         System.out.println("Numer of words: " + this.wordPaths.size());
         System.out.println("Initialized paths");
 
+        /*
         for (TIntObjectIterator<ArrayList<Path>> it = this.wordPaths.iterator(); it.hasNext(); ) {
         	it.advance();
         	ArrayList<Path> paths = it.value();
@@ -258,7 +259,7 @@ public class PriorTree {
         	}
 		}
 		System.out.println("**************************");
-		
+
 		// check the prior
 		System.out.println("Check the prior");
 		for (TIntObjectIterator<Node> it = this.nodes.iterator(); it.hasNext(); ) {
@@ -269,6 +270,7 @@ public class PriorTree {
 			}
 		}
 		System.out.println("**************************");
+		*/
 		
 	}
 	

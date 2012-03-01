@@ -152,14 +152,16 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 			for (int jj = 0; jj < original_tokens.getLength(); jj++) {
 				String word = (String) original_tokens.getObjectAtPosition(jj);
 				int token = this.vocab.indexOf(word);
-				int topic = random.nextInt(numTopics);
-				if(debug) { topic = count % numTopics; }
-				tokens.add(token);
-				topics.add(topic);
-				topicCounts.adjustOrPutValue(topic, 1, 1);
-				// sample a path for this topic
-				int path_index = this.topics.initialize(token, topic);
-				paths.add(path_index);
+				if(token != -1) {
+					int topic = random.nextInt(numTopics);
+					if(debug) { topic = count % numTopics; }
+					tokens.add(token);
+					topics.add(topic);
+					topicCounts.adjustOrPutValue(topic, 1, 1);
+					// sample a path for this topic
+					int path_index = this.topics.initialize(token, topic);
+					paths.add(path_index);
+				}
 			}
 			
 			DocData doc = new DocData(name, tokens, topics, paths, topicCounts);
@@ -194,20 +196,27 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 			myAssert(statesLine != null, "statesFile doesn't match with the training data");
 			statesLine = statesLine.trim();
 			String[] str = statesLine.split("\t");
-			myAssert(str.length == original_tokens.getLength(), "resume problem!");
 
+			int count = -1;
 			for (int jj = 0; jj < original_tokens.getLength(); jj++) {
 				String word = (String) original_tokens.getObjectAtPosition(jj);
 				int token = this.vocab.indexOf(word);
-				String[] tp = str[jj].split(":");
-				myAssert(tp.length == 2, "statesFile problem!");
-				int topic = Integer.parseInt(tp[0]);
-				int path = Integer.parseInt(tp[1]);
-				tokens.add(token);
-				topics.add(topic);
-				paths.add(path);
-				topicCounts.adjustOrPutValue(topic, 1, 1);
-				this.topics.changeCountOnly(topic, token, path, 1);
+				if(token != -1) {
+					count++;
+					String[] tp = str[count].split(":");
+					myAssert(tp.length == 2, "statesFile problem!");
+					int topic = Integer.parseInt(tp[0]);
+					int path = Integer.parseInt(tp[1]);
+					tokens.add(token);
+					topics.add(topic);
+					paths.add(path);
+					topicCounts.adjustOrPutValue(topic, 1, 1);
+					this.topics.changeCountOnly(topic, token, path, 1);
+				}
+			}
+			if(count != -1) {
+				count++;
+				myAssert(str.length == count, "resume problem!");
 			}
 			
 			DocData doc = new DocData(name, tokens, topics, paths, topicCounts);

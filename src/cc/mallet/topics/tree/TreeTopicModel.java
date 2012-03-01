@@ -239,7 +239,6 @@ public abstract class TreeTopicModel {
 	protected int samplePathFromPrior(int term, double sample) {
 		int sampled_path = -1;
 		sample *= this.priorSum.get(term);
-		
 		TIntDoubleHashMap paths = this.priorPath.get(term);
 		for(TIntDoubleIterator it = paths.iterator(); it.hasNext(); ) {
 			it.advance();
