@@ -137,7 +137,11 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 		if(this.topics instanceof TreeTopicModelFastEst) {
 			TreeTopicModelFastEst tmp = (TreeTopicModelFastEst) this.topics;
 			tmp.computeSmoothingEst(this.alpha);
+		} else if (this.topics instanceof TreeTopicModelFastEstSortT) {
+			TreeTopicModelFastEstSortT tmp = (TreeTopicModelFastEstSortT) this.topics;
+			tmp.computeSmoothingEst(this.alpha);
 		}
+		
 		super.estimate(numIterations, outputFolder, outputInterval, topWords);
 	}
 	
