@@ -19,7 +19,7 @@ public class TreeTopicSamplerFastEstSortD extends TreeTopicSamplerSortD{
 		if (sort) {
 		    this.topics = new TreeTopicModelFastEstSortT(this.numTopics, this.random);
 		} else {
-			this.topics = new TreeTopicModelFastEst(this.numTopics, this.random);
+			this.topics = new TreeTopicModelFast(this.numTopics, this.random);
 		}
 	}
 	
