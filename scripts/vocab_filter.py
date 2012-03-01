@@ -10,8 +10,8 @@ def readStats(filename):
   for line in infile:
     line = line.strip()
     ww = line.split('\t')
-    tfidf[ww[0]].inc(ww[1], ww[2])
-    frequency[ww[0]].inc(ww[1], ww[3])
+    tfidf[ww[0]].inc(ww[1], float(ww[2]))
+    frequency[ww[0]].inc(ww[1], int(ww[3]))
 
   infile.close()
   return tfidf, frequency
