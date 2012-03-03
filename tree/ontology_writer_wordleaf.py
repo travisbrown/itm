@@ -612,7 +612,7 @@ def getCliqueCount(cons, constraints_count):
         for clique in cons[1]:
             constraints_count = getCliqueCount(clique, constraints_count)    
     else:
-        print cons
+        #print cons
         word = cons
         if word not in constraints_count.keys():
             constraints_count[word] = 1
@@ -783,13 +783,15 @@ def write_constraints():
 
     # read in constraints
     ml_cons, cl_cons = readConstraints(flags.constraints)
+    print ml_cons
+    print cl_cons
 
     # Merge constraints
     if flags.merge_constraints:
         ml_updated, cl_updated = mergeAllConstraints(ml_cons, cl_cons)
-    #else:
-    #       ml_updated = map(lambda x: ['ML_', set(x)], ml)
-    #       cl_updated = map(lambda x: ['CL_', set(x)], cl)
+    else:
+        ml_updated = map(lambda x: ['ML_', set(x)], ml_cons)
+        cl_updated = map(lambda x: ['CL_', set(x)], cl_cons)
     print ml_updated
     print cl_updated
 	

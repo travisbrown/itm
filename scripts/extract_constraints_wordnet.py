@@ -16,7 +16,7 @@ def readVocab(vocabname):
   infile.close()
   return vocab
 
-def generateCons(vocab, wn, outfilename):
+def generateCons(vocab, wn, outfilename, num_cons):
   lang = '0'
   cons = defaultdict(dict)
   for word in vocab[lang]:
@@ -28,18 +28,51 @@ def generateCons(vocab, wn, outfilename):
         cons[pos][syn.offset].add(word)
 
   outfile = codecs.open(outfilename, 'w', 'utf-8')
+  multipaths = defaultdict(dict)
+  count = 0
   for pos in cons:
     for syn in cons[pos]:
       if len(cons[pos][syn]) > 1:
-        words = list(cons[pos][syn])
-        tmp = "\t".join(words)
-        outfile.write("MERGE_\t" + tmp + "\n")
+        count += 1
+        if count <= num_cons:
+          words = list(cons[pos][syn])
+          tmp = "\t".join(words)
+          outfile.write("MERGE_\t" + tmp + "\n")
+          for word in words:
+            if not pos in multipaths[word]:
+              multipaths[word][pos] = set()
+            multipaths[word][pos].add(syn)
   outfile.close()
-  
+
+  outfilename = outfilename.replace(".cons", ".interested")
+  print outfilename
+  outfile = codecs.open(outfilename, 'w', 'utf-8')
+  count_word = 0
+  count_sense = 0
+  word_senses_count = defaultdict()
+  im_words = ""
+  for word in multipaths:
+    word_senses_count[word] = 0
+    count_word += 1
+    tmp = word
+    for pos in multipaths[word]:
+      tmp += '\t' + pos
+      for index in multipaths[word][pos]:
+        word_senses_count[word] += 1
+        count_sense += 1
+        tmp += '\t' + str(index)
+    if word_senses_count[word] > 1:
+      im_words += word + " "
+    outfile.write(tmp + '\n')
+  outfile.write("\nThe total number of cons words: " + str(count_word) + "\n")
+  outfile.write("\nThe total number of cons words senses: " + str(count_sense) + "\n")
+  outfile.write("\nInteresting words: " + im_words + "\n")
+  outfile.close()
 
 
 flags.define_string("vocab", None, "The input vocab")
 flags.define_string("output", None, "The output constraint file")
+flags.define_int("num_cons", 0, "The number of constraints we want")
 
 if __name__ == "__main__":
 
@@ -47,5 +80,5 @@ if __name__ == "__main__":
   wordnet_path = "../../../data/wordnet/" 
   eng_wn = load_wn("3.0", wordnet_path, "wn")
   vocab = readVocab(flags.vocab)
-  generateCons(vocab, eng_wn, flags.output)
+  generateCons(vocab, eng_wn, flags.output, flags.num_cons)
   
