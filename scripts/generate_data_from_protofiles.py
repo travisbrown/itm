@@ -2,51 +2,10 @@ from glob import glob
 from topicmod.util import flags
 from topicmod.corpora.proto.corpus_pb2 import *
 from topicmod.corpora.proto.wordnet_file_pb2 import *
-from PMI_statistics import readVocab
 from collections import defaultdict
 from nltk import FreqDist
 import codecs
 
-def gen_files_old(proto_corpus_dir, vocab_file, output_dir):
-
-  [vocab_word_index, vocab_index_word] = readVocab(vocab_file)
-
-  doc_num = 0
-  vocab = dict()
-
-  for ii in glob("%s/*.index" % proto_corpus_dir):
-    inputfile = open(ii, 'rb')
-    protocorpus = Corpus()
-    protocorpus.ParseFromString(inputfile.read())
-    
-    for token in protocorpus.tokens:
-      vocab[token.id] = token.original
-
-    for dd in protocorpus.doc_filenames:
-      doc_num += 1
-      if doc_num % 1000 == 0:
-        print "Finished reading", doc_num, "documents."
-
-      docfile = open("%s/%s" % (proto_corpus_dir, dd), 'rb')
-      doc = Document()
-      doc.ParseFromString(docfile.read())
-      
-      outputstring = ""
-
-      for jj in doc.sentences:
-        for kk in jj.words:
-          word = vocab_index_word[kk.token]
-          outputstring += word + " "
-      outputstring = outputstring.strip()
-      outputstring += "\n"
-      
-      outputfilename = dd.replace('assign/', '')
-      outputfilename = output_dir + "/" + outputfilename
-      outputfile = open(outputfilename, 'w')
-      outputfile.write(outputstring)
-      outputfile.close()
-
-    inputfile.close()
 
 def gen_files(proto_corpus_dir, output_dir, lemma_flag):
 
