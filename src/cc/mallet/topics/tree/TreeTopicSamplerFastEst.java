@@ -66,12 +66,14 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 				sample *= norm;
 				if (sample < smoothing_mass) {
 					tmpstats[1] += 1;
+					int tmpstats_count = -1;					
 					for (int tt = 0; tt < this.numTopics; tt++) {
 						for (int pp : paths) {
 							double val = alpha[tt] * this.topics.getPathPrior(word, pp);
 							val /= this.topics.getNormalizer(tt, pp);
 							sample -= val;
 							if (sample <= 0.0) {
+								tmpstats[4] += tmpstats_count;
 								new_topic = tt;
 								new_path = pp;
 								break;
@@ -92,12 +94,15 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			// sample topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
 				tmpstats[2] += 1;
+				int tmpstats_count = -1;
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
+						tmpstats_count += 1;
 						double val = doc.topicCounts.get(tt) * this.topics.getPathPrior(word, pp);
 						val /= this.topics.getNormalizer(tt, pp);
 						sample -= val;
 						if (sample <= 0.0) {
+							tmpstats[4] += tmpstats_count;							
 							new_topic = tt;
 							new_path = pp;
 							break;
@@ -122,6 +127,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 					double val = tmp[2];
 					sample -= val;
 					if (sample <= 0.0) {
+						tmpstats[4] += jj;
 						new_topic = tt;
 						new_path = pp;
 						break;

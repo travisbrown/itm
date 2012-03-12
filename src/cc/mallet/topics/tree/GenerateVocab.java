@@ -87,12 +87,6 @@ public class GenerateVocab {
 				index++;
 				array[index] = new WordCount(word, count);
 			}
-			System.out.println("helloddddddddddd");
-			
-			
-			for(int ii = 0; ii < array.length; ii++) {
-				System.out.println(array[ii].word + "\t" + array[ii].count);
-			}
 			
 			Arrays.sort(array);
 			
