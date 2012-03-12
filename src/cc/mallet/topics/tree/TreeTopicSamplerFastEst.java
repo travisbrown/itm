@@ -32,6 +32,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 	public void sampleDoc(int doc_id) {
 		DocData doc = this.data.get(doc_id);
 		//System.out.println("doc " + doc_id);
+		int[] tmpstats = this.stats.get(this.stats.size()-1);
 		
 		for(int ii = 0; ii < doc.tokens.size(); ii++) {	
 			//int word = doc.tokens.getIndexAtPosition(ii);
@@ -58,11 +59,13 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			// sample the smoothing bin
 			if (sample < smoothing_mass_est) {
+				tmpstats[0] += 1;
 				double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 				double norm =  smoothing_mass + topic_beta_mass + topic_term_mass;
 				sample /= norm_est;
 				sample *= norm;
 				if (sample < smoothing_mass) {
+					tmpstats[1] += 1;
 					for (int tt = 0; tt < this.numTopics; tt++) {
 						for (int pp : paths) {
 							double val = alpha[tt] * this.topics.getPathPrior(word, pp);
@@ -88,6 +91,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			// sample topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
+				tmpstats[2] += 1;
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
 						double val = doc.topicCounts.get(tt) * this.topics.getPathPrior(word, pp);
@@ -110,6 +114,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			// sample topic term bin
 			if (new_topic < 0) {
+				tmpstats[3] += 1;
 				for(int jj = 0; jj < topic_term_score.size(); jj++) {
 					double[] tmp = topic_term_score.get(jj);
 					int tt = (int) tmp[0];

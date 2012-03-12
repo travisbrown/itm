@@ -26,6 +26,8 @@ public class TreeTopicSamplerFastSortD extends TreeTopicSamplerSortD {
 	
 	public TreeTopicSamplerFastSortD (int numberOfTopics, double alphaSum, int seed, boolean sort) {
 		super(numberOfTopics, alphaSum, seed);
+		this.topics = new TreeTopicModelFast(this.numTopics, this.random);
+		
 		if (sort) {
 		    this.topics = new TreeTopicModelFastSortT(this.numTopics, this.random);
 		} else {

@@ -19,7 +19,7 @@ public class TreeTopicSamplerFastEstSortD extends TreeTopicSamplerSortD{
 		if (sort) {
 		    this.topics = new TreeTopicModelFastEstSortT(this.numTopics, this.random);
 		} else {
-			this.topics = new TreeTopicModelFastEst(this.numTopics, this.random);
+			this.topics = new TreeTopicModelFast(this.numTopics, this.random);
 		}
 	}
 	
@@ -137,9 +137,6 @@ public class TreeTopicSamplerFastEstSortD extends TreeTopicSamplerSortD{
 	public void estimate(int numIterations, String outputFolder, int outputInterval, int topWords) {
 		if(this.topics instanceof TreeTopicModelFastEst) {
 			TreeTopicModelFastEst tmp = (TreeTopicModelFastEst) this.topics;
-			tmp.computeSmoothingEst(this.alpha);
-		} else if (this.topics instanceof TreeTopicModelFastEstSortT) {
-			TreeTopicModelFastEstSortT tmp = (TreeTopicModelFastEstSortT) this.topics;
 			tmp.computeSmoothingEst(this.alpha);
 		}
 		super.estimate(numIterations, outputFolder, outputInterval, topWords);
