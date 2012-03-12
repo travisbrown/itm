@@ -70,7 +70,7 @@ public class GenerateVocab {
 				String word = alphabet.lookupObject(ii).toString();
 				freq.put(word, 0);
 			}
-			
+
 			for (Instance instance : data) {
 				FeatureSequence original_tokens = (FeatureSequence) instance.getData();
 				for (int jj = 0; jj < original_tokens.getLength(); jj++) {
@@ -84,8 +84,16 @@ public class GenerateVocab {
 			for(Object o : freq.keys()) {
 				String word = (String)o;
 				int count = freq.get(word);
-				array[count] = new WordCount(word, count);
+				index++;
+				array[index] = new WordCount(word, count);
 			}
+			System.out.println("helloddddddddddd");
+			
+			
+			for(int ii = 0; ii < array.length; ii++) {
+				System.out.println(array[ii].word + "\t" + array[ii].count);
+			}
+			
 			Arrays.sort(array);
 			
 			

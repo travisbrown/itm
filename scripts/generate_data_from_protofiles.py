@@ -72,10 +72,11 @@ def gen_files(proto_corpus_dir, output_dir, lemma_flag):
 
 def gen_vocab(vocab, tfidf, frequency, select_tfidf, outputname, vocab_limit, freq_limit):
 
+  for ii in tfidf:
+    for jj in tfidf[ii]:
+      tfidf[ii][jj] /= frequency[ii][jj]
+
   if select_tfidf:
-    for ii in tfidf:
-      for jj in tfidf[ii]:
-        tfidf[ii][jj] /= frequency[ii][jj]
     rank = tfidf
   else:
     rank = frequency
