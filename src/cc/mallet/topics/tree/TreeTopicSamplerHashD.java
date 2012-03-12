@@ -111,7 +111,7 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 		this.lhood = new TDoubleArrayList();
 		this.iterTime = new TDoubleArrayList();
 		this.startIter = 0;
-		this.stats = new ArrayList();
+		this.stats = new ArrayList<int[]> ();
 		
 		// notice: this.topics is not initialized in this abstract class,
 		// in each sub class, the topics variable is initialized differently.
