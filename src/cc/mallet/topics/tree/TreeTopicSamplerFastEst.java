@@ -57,7 +57,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
 			totaltime = System.currentTimeMillis() - starttime;
 			tmpstats[7] += (int)totaltime;				
-	
+			tmpstats[10] += topic_term_score.size();
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();
