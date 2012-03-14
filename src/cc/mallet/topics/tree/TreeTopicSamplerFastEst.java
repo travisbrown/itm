@@ -59,8 +59,10 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			tmpstats[7] += (int)totaltime;
 			if(this.cons.contains(word)) {
 				tmpstats[10] += topic_term_score.size();
+				tmpstats[11] += 1;
 			} else {
-				tmpstats[11] += topic_term_score.size();
+				tmpstats[12] += topic_term_score.size();
+				tmpstats[13] += 1;
 			}
 			
 			

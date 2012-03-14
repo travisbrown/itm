@@ -350,7 +350,7 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 		// update parameters
 		this.topics.updateParams();
 		for (int ii = this.startIter; ii <= numIterations; ii++) {
-			int[] tmpstats = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			int[] tmpstats = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			this.stats.add(tmpstats);
 			long starttime = System.currentTimeMillis();
 			//System.out.println("Iter " + ii);
