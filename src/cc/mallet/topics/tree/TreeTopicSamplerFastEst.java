@@ -43,15 +43,21 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			long totaltime = System.currentTimeMillis() - starttime;
 			tmpstats[5] += (int)totaltime;
 			
-			starttime = System.currentTimeMillis();
+
 			//double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 			double smoothing_mass_est = this.topics.smoothingEst.get(word);
-			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
 			
+			starttime = System.currentTimeMillis();
+			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
+			totaltime = System.currentTimeMillis() - starttime;
+			tmpstats[6] += (int)totaltime;		
+			
+			starttime = System.currentTimeMillis();
 			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
 			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
 			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[6] += (int)totaltime;			
+			tmpstats[7] += (int)totaltime;				
+	
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();
@@ -72,15 +78,13 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 				sample /= norm_est;
 				sample *= norm;
 				if (sample < smoothing_mass) {
-					tmpstats[1] += 1;
-					int tmpstats_count = -1;					
+					tmpstats[1] += 1;			
 					for (int tt = 0; tt < this.numTopics; tt++) {
 						for (int pp : paths) {
 							double val = alpha[tt] * this.topics.getPathPrior(word, pp);
 							val /= this.topics.getNormalizer(tt, pp);
 							sample -= val;
 							if (sample <= 0.0) {
-								tmpstats[4] += tmpstats_count;
 								new_topic = tt;
 								new_path = pp;
 								break;
@@ -101,15 +105,12 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			// sample topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
 				tmpstats[2] += 1;
-				int tmpstats_count = -1;
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
-						tmpstats_count += 1;
 						double val = doc.topicCounts.get(tt) * this.topics.getPathPrior(word, pp);
 						val /= this.topics.getNormalizer(tt, pp);
 						sample -= val;
-						if (sample <= 0.0) {
-							tmpstats[4] += tmpstats_count;							
+						if (sample <= 0.0) {						
 							new_topic = tt;
 							new_path = pp;
 							break;
@@ -144,12 +145,12 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			}
 			
 			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[7] += (int)totaltime;			
+			tmpstats[8] += (int)totaltime;			
 			
 			starttime = System.currentTimeMillis();
 			this.changeTopic(doc_id, ii, word, new_topic, new_path);
 			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[8] += (int)totaltime;			
+			tmpstats[9] += (int)totaltime;			
 		}
 		
 	}
