@@ -38,14 +38,20 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			//int word = doc.tokens.getIndexAtPosition(ii);
 			int word = doc.tokens.get(ii);
 			
+			long starttime = System.currentTimeMillis();
 			this.changeTopic(doc_id, ii, word, -1, -1);
+			long totaltime = System.currentTimeMillis() - starttime;
+			tmpstats[5] += (int)totaltime;
 			
+			starttime = System.currentTimeMillis();
 			//double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 			double smoothing_mass_est = this.topics.smoothingEst.get(word);
 			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
 			
 			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
 			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
+			totaltime = System.currentTimeMillis() - starttime;
+			tmpstats[6] += (int)totaltime;			
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();
@@ -57,6 +63,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			int[] paths = this.topics.getWordPathIndexSet(word);
 			
+			starttime = System.currentTimeMillis();
 			// sample the smoothing bin
 			if (sample < smoothing_mass_est) {
 				tmpstats[0] += 1;
@@ -136,7 +143,13 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 				myAssert((new_topic >= 0 && new_topic < numTopics), "something wrong in sampling topic term!");
 			}
 			
+			totaltime = System.currentTimeMillis() - starttime;
+			tmpstats[7] += (int)totaltime;			
+			
+			starttime = System.currentTimeMillis();
 			this.changeTopic(doc_id, ii, word, new_topic, new_path);
+			totaltime = System.currentTimeMillis() - starttime;
+			tmpstats[8] += (int)totaltime;			
 		}
 		
 	}
