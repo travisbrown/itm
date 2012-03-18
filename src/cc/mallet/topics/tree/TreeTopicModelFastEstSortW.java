@@ -12,8 +12,8 @@ import java.util.Random;
  * serves as the upper bound of smoothing.
  * Author: Yuening Hu
  */
-public class TreeTopicModelFastEstSortT extends TreeTopicModelFastSortT {
-	public TreeTopicModelFastEstSortT(int numTopics, Random random) {
+public class TreeTopicModelFastEstSortW extends TreeTopicModelFastSortW {
+	public TreeTopicModelFastEstSortW(int numTopics, Random random) {
 		super(numTopics, random);
 		this.smoothingEst = new TIntDoubleHashMap();
 	}

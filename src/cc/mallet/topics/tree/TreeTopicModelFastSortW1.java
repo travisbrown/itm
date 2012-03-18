@@ -15,9 +15,9 @@ import java.util.Random;
  *                           sorted[2] = (masked_path) + real_count
  * Author: Yuening Hu
  */
-public class TreeTopicModelFastSortT1  extends TreeTopicModelFast {
+public class TreeTopicModelFastSortW1  extends TreeTopicModelFast {
 	
-	public TreeTopicModelFastSortT1(int numTopics, Random random) {
+	public TreeTopicModelFastSortW1(int numTopics, Random random) {
 		super(numTopics, random);
 	}
 	

@@ -10,15 +10,15 @@ import java.util.Random;
 
 /**
  * nonZeroPathsBubbleSorted: Arraylist<int[]> sorted
- *                           sorted[0] = (topic << TOPIC_BITS) + path
- *                           sorted[1] = (masked_path) + real_count
+ *                           sorted[0] = topic
+ *                           sorted[1] = path
+ *                           sorted[2] = maksed_path
+ *                           sorted[3] = real_counts
  * Author: Yuening Hu
  */
-public class TreeTopicModelFastSortT extends TreeTopicModelFast {
+public class TreeTopicModelFastSortW2 extends TreeTopicModelFast {
 	
-	int TOPIC_BITS = 16;
-	
-	public TreeTopicModelFastSortT(int numTopics, Random random) {
+	public TreeTopicModelFastSortW2(int numTopics, Random random) {
 		super(numTopics, random);
 	}
 	
@@ -33,6 +33,7 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 				this.nonZeroPathsBubbleSorted.put(ww, sorted);
 			}
 		}
+		
 		for(int tt = 0; tt < this.numTopics; tt++) {
 			for(int pp = 0; pp < this.getPathNum(); pp++) {
 				this.updatePathMaskedCount(pp, tt);				
@@ -57,8 +58,7 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		int leaf_node = path_nodes.get(path_nodes.size() - 1);
 		int original_count = tw.getNodeCount(leaf_node);
 		
-		int shift_count = this.INTBITS;
-		int count = this.maxDepth - 1;
+		int count = this.maxDepth;
 		int val = 0;
 		boolean flag = false;
 		
@@ -67,91 +67,35 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		// else use "0"
 		for(int nn = 1; nn < path_nodes.size(); nn++) {
 			int node = path_nodes.get(nn);
-			shift_count--;
 			count--;
 			if (tw.getNodeCount(node) > 0) {
 				flag = true;
-				val += 1 << shift_count;
+				val += 1 << count;
 			}
 		}
 		
 		// if a path is shorter than tree depth, fill in "1"
 		// should we fit in "0" ???
 		while (flag && count > 0) {
-			shift_count--;
-			val += 1 << shift_count;
 			count--;
+			val += 1 << count;
 		}
 		
-		val += original_count;
-		this.addOrUpdateValue(topic, path, ww, val, false);
+		this.addOrUpdateValue(topic, path, ww, val, original_count, false);
 
 	}
 	
-	private void addOrUpdateValueold(int topic, int path, int word, int newvalue, boolean flag) {
+	private void addOrUpdateValue (int topic, int path, int word, int newpathvalue, int newcount, boolean flag) {
 		ArrayList<int[]> sorted = this.nonZeroPathsBubbleSorted.get(word);
-		int key = (topic << TOPIC_BITS) + path;
+		
 		//remove the old value
-		int oldindex = sorted.size();
-		int oldvalue = -1;
+		int pathvalue = 0;
+		int count = 0;
 		for(int ii = 0; ii < sorted.size(); ii++) {
 			int[] tmp = sorted.get(ii);
-			if(tmp[0] == key) {
-				oldvalue = tmp[1];
-				sorted.remove(ii);
-				break;
-			}
-		}
-		if(oldindex > sorted.size()) {
-			oldindex--;
-		}
-		
-		// flag is true, increase value, else just update value
-		int value = 0;
-		if(flag) {
-			value = oldvalue + newvalue;
-		} else {
-			value = newvalue;
-		}
-		
-		//add the new value
-		if (value > 0) {
-			int index;
-			if (value > oldvalue) {
-				index = 0;
-				for(int ii = oldindex - 1; ii >= 0; ii--) {
-					//System.out.println(ii + " " + oldindex + " " + sorted.size());
-					int[] tmp = sorted.get(ii);
-					if(value <= tmp[1]) {
-						index = ii;
-						break;
-					}
-				}
-			} else {
-				index = sorted.size();
-				for(int ii = oldindex; ii < sorted.size(); ii++) {
-					int[] tmp = sorted.get(ii);
-					if(value >= tmp[1]) {
-						index = ii;
-						break;
-					}
-				}
-			}
-
-			int[] newpair = {key, value};
-			sorted.add(index, newpair);
-		}
-	}
-	
-	private void addOrUpdateValue(int topic, int path, int word, int newvalue, boolean flag) {
-		ArrayList<int[]> sorted = this.nonZeroPathsBubbleSorted.get(word);
-		int key = (topic << TOPIC_BITS) + path;
-		//remove the old value
-		int value = 0;
-		for(int ii = 0; ii < sorted.size(); ii++) {
-			int[] tmp = sorted.get(ii);
-			if(tmp[0] == key) {
-				value = tmp[1];
+			if(tmp[0] == topic && tmp[1] == path) {
+				pathvalue = tmp[2];
+				count = tmp[3];
 				sorted.remove(ii);
 				break;
 			}
@@ -159,23 +103,103 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		
 		// flag is true, increase value, else just update value
 		if(flag) {
-			value += newvalue;
+			count += newcount;
 		} else {
-			value = newvalue;
+			count = newcount;
+		}
+		
+		if(newpathvalue != -1) {
+			pathvalue = newpathvalue;
 		}
 		
 		//add the new value
-		if (value > 0) {
+		if (pathvalue > 0) {
 			int index = sorted.size();
 			for(int ii = 0; ii < sorted.size(); ii++) {
 				int[] tmp = sorted.get(ii);
-				if(value >= tmp[1]) {
+				if(count >= tmp[3]) {
 					index = ii;
 					break;
 				}
 			}
-			int[] newpair = {key, value};
+			int[] newpair = {topic, path, pathvalue, count};
 			sorted.add(index, newpair);
+		}
+	}
+	
+	private void addOrUpdateValueold (int topic, int path, int word, int newpathvalue, int newcount, boolean flag) {
+		
+		ArrayList<int[]> sorted = this.nonZeroPathsBubbleSorted.get(word);
+		
+		// find the position
+		int index = sorted.size();
+		int pathvalue = -1;
+		int count = -1;
+		for(int ii = 0; ii < sorted.size(); ii++) {
+			int[] tmp = sorted.get(ii);
+			if(tmp[0] == topic && tmp[1] == path) {
+				pathvalue = tmp[2];
+				count = tmp[3];
+				break;
+			}
+		}
+		
+		// flag is true, increase value, else just update value
+		if(flag) {
+			count += newcount;
+		} else {
+			count = newcount;
+		}
+		
+		if(newpathvalue != -1) {
+			pathvalue = newpathvalue;
+		}
+		
+		// adjust the value and update or insert
+		if (index == sorted.size()) {
+			int[] newpair = {topic, path, pathvalue, count};
+			sorted.add(newpair);
+		} else {
+			int[] current = sorted.get(index);
+			current[0] = topic;
+			current[1] = path;
+			current[2] = pathvalue;
+			current[3] = count;
+		}
+		
+		// bubble to left
+		for(int ii = index-1; ii >= 0; ii--) {
+			int[] left = sorted.get(ii);
+			int[] current = sorted.get(ii+1);
+			if(current[3] > left[3]) {
+				int num = 3;
+				while(num >= 0) {
+					int tmp = current[num];
+					current[num] = left[num];
+					left[num] = tmp;
+					num--;
+				}
+				//int a = 0;
+			} else {
+				break;
+			}
+		}
+		
+		// bubble to right
+		for(int ii = index + 1; ii < sorted.size(); ii++) {
+			int[] right = sorted.get(ii);
+			int[] current = sorted.get(ii-1);
+			if(current[3] < right[3]) {
+				int num = 3;
+				while(num >= 0) {
+					int tmp = current[num];
+					current[num] = right[num];
+					right[num] = tmp;
+					num--;
+				}
+			} else {
+				break;
+			}
 		}
 	}
 	
@@ -198,7 +222,7 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		int[] affected_nodes = tw.changeCount(path_nodes, delta);
 		
 		// change path count
-		this.addOrUpdateValue(topic, path_index, word, delta, true);
+		this.addOrUpdateValue(topic, path_index, word, -1, delta, true);
 		
 		// if necessary, change the path mask of the affected nodes
 		if (affected_nodes != null && affected_nodes.length > 0) {
@@ -231,9 +255,8 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		// Notice only the nonzero paths are considered
 		for(int ii = 0; ii < nonzeros.size(); ii++) {
 			int[] tmp = nonzeros.get(ii);
-			int key = tmp[0];
-			int tt = key >> TOPIC_BITS;
-			int pp = key - (tt << TOPIC_BITS);
+			int tt = tmp[0];
+			int pp = tmp[1];
 
 			double topic_alpha = alpha[tt];
 			int topic_count = local_topic_counts.get(tt);
@@ -247,8 +270,34 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 			double[] result = {tt, pp, val};
 			dict.add(result);
 			
+//			int index = dict.size();
+//			for(int jj = 0; jj < dict.size(); jj++) {
+//				double[] find = dict.get(jj);
+//				//System.out.println(find[2] + " " + val);
+//				if(val >= find[2]) {
+//					index = jj;
+//					break;
+//				}
+//			}
+//			dict.add(index, result);
+			
+//			int index = 0;
+//			for(int jj = dict.size() - 1; jj >= 0 ; jj--) {
+//				double[] find = dict.get(jj);
+//				if(val <= find[2]) {
+//					index = jj;
+//					break;
+//				}
+//			}
+//			dict.add(index, result);
+			
 			norm += val;
 		}
+		
+//		for(int ii = 0; ii < dict.size(); ii++) {
+//			double[] tmp = dict.get(ii);
+//			System.out.println(tmp[0] + " " + tmp[1] + " " + tmp[2]);
+//		}
 		
 		return norm;
 	}
@@ -271,9 +320,8 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		// Notice only the nonzero paths are considered
 		for(int ii = 0; ii < nonzeros.size(); ii++) {
 			int[] tmp = nonzeros.get(ii);
-			int key = tmp[0];
-			int tt = key >> TOPIC_BITS;
-			int pp = key - (tt << TOPIC_BITS);
+			int tt = tmp[0];
+			int pp = tmp[1];
 
 			double topic_alpha = alpha[tt];
 			int topic_count = tmpTopics[tt];
@@ -291,5 +339,4 @@ public class TreeTopicModelFastSortT extends TreeTopicModelFast {
 		}
 		return norm;
 	}
-	
 }
