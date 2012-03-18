@@ -71,7 +71,7 @@ public class Vectors2Topics {
 	
 	static CommandOption.String modelType = new CommandOption.String
 	(Vectors2Topics.class, "tree-model-type", "TYPENAME", true, "fast-est",
-	 "Three possible types: naive, fast, fast-est, fast-sortD, fast-est-sortD.", null);
+	 "Three possible types: naive, fast, fast-est, fast-sortD, fast-sortW, fast-sortD-sortW, fast-est-sortD, fast-est-sortW, fast-est-sortD-sortW.", null);
 
 	static CommandOption.String treeFiles = new CommandOption.String
 	(Vectors2Topics.class, "tree", "FILENAME", true, null,
@@ -113,9 +113,9 @@ public class Vectors2Topics {
 	(Vectors2Topics.class, "generate-vocab", "true|false", false, false,
 	"Generate vocab after mallet preprocessing.", null);
 		
-	static CommandOption.Boolean sortTOption = new CommandOption.Boolean
-	(Vectors2Topics.class, "sort-topic", "true|false", false, true,
-	 "Sort the topic counts for each term or not.", null);
+	//static CommandOption.Boolean sortTOption = new CommandOption.Boolean
+	//(Vectors2Topics.class, "sort-topic", "true|false", false, true,
+	// "Sort the topic counts for each term or not.", null);
 	
 	public static void main (String[] args) throws java.io.IOException
 	{
@@ -133,21 +133,42 @@ public class Vectors2Topics {
 			} else {
 		        //TreeTopicSamplerHashD topicModel = null;
 				TreeTopicSampler topicModel = null;
+				boolean sortW = false;
+				
 		        if (modelType.value.equals("naive")) {
 		        	topicModel = new TreeTopicSamplerNaive( 
 						numTopics.value, alpha.value, randomSeed.value);
+		        	
 				} else if (modelType.value.equals("fast")){
 					topicModel = new TreeTopicSamplerFast(
-							numTopics.value, alpha.value, randomSeed.value, sortTOption.value);
-				} else if (modelType.value.equals("fast-est")) {
-					topicModel = new TreeTopicSamplerFastEst(
-							numTopics.value, alpha.value, randomSeed.value, sortTOption.value);
+							numTopics.value, alpha.value, randomSeed.value, sortW);
 				} else if (modelType.value.equals("fast-sortD")){
 					topicModel = new TreeTopicSamplerFastSortD(
-							numTopics.value, alpha.value, randomSeed.value, sortTOption.value);
+							numTopics.value, alpha.value, randomSeed.value, sortW);
+				} else if (modelType.value.equals("fast-sortW")){
+					sortW = true;
+					topicModel = new TreeTopicSamplerFast(
+							numTopics.value, alpha.value, randomSeed.value, sortW);
+				} else if (modelType.value.equals("fast-sortD-sortW")){
+					sortW = true;
+					topicModel = new TreeTopicSamplerFastSortD(
+							numTopics.value, alpha.value, randomSeed.value, sortW);
+					
+				} else if (modelType.value.equals("fast-est")) {
+					topicModel = new TreeTopicSamplerFastEst(
+							numTopics.value, alpha.value, randomSeed.value, sortW);
 				} else if (modelType.value.equals("fast-est-sortD")) {
 					topicModel = new TreeTopicSamplerFastEstSortD(
-							numTopics.value, alpha.value, randomSeed.value, sortTOption.value);
+							numTopics.value, alpha.value, randomSeed.value, sortW);
+				} else if (modelType.value.equals("fast-est-sortW")) {
+					sortW = true;
+					topicModel = new TreeTopicSamplerFastEst(
+							numTopics.value, alpha.value, randomSeed.value, sortW);						
+				} else if (modelType.value.equals("fast-est-sortD-sortW")) {
+					sortW = true;
+					topicModel = new TreeTopicSamplerFastEstSortD(
+							numTopics.value, alpha.value, randomSeed.value, sortW);
+					
 				} else {
 					System.out.println("model type wrong! please use " +
 							"'naive' 'fast' or 'fast-est'!");
@@ -185,7 +206,7 @@ public class Vectors2Topics {
 				}
 				
 				// sampling and save states
-				topicModel.estimate(numIterations.value, outputDir.value, 
+				topicModel.estimate(numIterations.value, outputDir.value,
 									outputInteval.value, topWords.value);
 				
 				// topic report

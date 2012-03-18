@@ -19,7 +19,7 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 		super(numberOfTopics, alphaSum, seed);
 		
 		if (sort) {
-		    this.topics = new TreeTopicModelFastEstSortT(this.numTopics, this.random);
+		    this.topics = new TreeTopicModelFastEstSortW(this.numTopics, this.random);
 		} else {
 			this.topics = new TreeTopicModelFastEst(this.numTopics, this.random);
 		}
@@ -32,39 +32,22 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 	public void sampleDoc(int doc_id) {
 		DocData doc = this.data.get(doc_id);
 		//System.out.println("doc " + doc_id);
-		int[] tmpstats = this.stats.get(this.stats.size()-1);
+		//int[] tmpstats = this.stats.get(this.stats.size()-1);
 		
 		for(int ii = 0; ii < doc.tokens.size(); ii++) {	
 			//int word = doc.tokens.getIndexAtPosition(ii);
 			int word = doc.tokens.get(ii);
 			
-			long starttime = System.currentTimeMillis();
 			this.changeTopic(doc_id, ii, word, -1, -1);
-			long totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[5] += (int)totaltime;
 			
 
 			//double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 			double smoothing_mass_est = this.topics.smoothingEst.get(word);
 			
-			starttime = System.currentTimeMillis();
-			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);
-			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[6] += (int)totaltime;		
+			double topic_beta_mass = this.topics.computeTermTopicBeta(doc.topicCounts, word);	
 			
-			starttime = System.currentTimeMillis();
 			ArrayList<double[]> topic_term_score = new ArrayList<double[]>();
-			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);
-			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[7] += (int)totaltime;
-			if(this.cons.contains(word)) {
-				tmpstats[10] += topic_term_score.size();
-				tmpstats[11] += 1;
-			} else {
-				tmpstats[12] += topic_term_score.size();
-				tmpstats[13] += 1;
-			}
-			
+			double topic_term_mass = this.topics.computeTopicTerm(this.alpha, doc.topicCounts, word, topic_term_score);			
 			
 			double norm_est = smoothing_mass_est + topic_beta_mass + topic_term_mass;
 			double sample = this.random.nextDouble();
@@ -76,16 +59,13 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			int[] paths = this.topics.getWordPathIndexSet(word);
 			
-			starttime = System.currentTimeMillis();
 			// sample the smoothing bin
 			if (sample < smoothing_mass_est) {
-				tmpstats[0] += 1;
 				double smoothing_mass = this.topics.computeTermSmoothing(this.alpha, word);
 				double norm =  smoothing_mass + topic_beta_mass + topic_term_mass;
 				sample /= norm_est;
 				sample *= norm;
-				if (sample < smoothing_mass) {
-					tmpstats[1] += 1;			
+				if (sample < smoothing_mass) {		
 					for (int tt = 0; tt < this.numTopics; tt++) {
 						for (int pp : paths) {
 							double val = alpha[tt] * this.topics.getPathPrior(word, pp);
@@ -111,7 +91,6 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			// sample topic beta bin
 			if (new_topic < 0 && sample < topic_beta_mass) {
-				tmpstats[2] += 1;
 				for(int tt : doc.topicCounts.keys()) {
 					for (int pp : paths) {
 						double val = doc.topicCounts.get(tt) * this.topics.getPathPrior(word, pp);
@@ -134,7 +113,6 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 			
 			// sample topic term bin
 			if (new_topic < 0) {
-				tmpstats[3] += 1;
 				for(int jj = 0; jj < topic_term_score.size(); jj++) {
 					double[] tmp = topic_term_score.get(jj);
 					int tt = (int) tmp[0];
@@ -142,22 +120,15 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 					double val = tmp[2];
 					sample -= val;
 					if (sample <= 0.0) {
-						tmpstats[4] += jj;
 						new_topic = tt;
 						new_path = pp;
 						break;
 					}
 				}
 				myAssert((new_topic >= 0 && new_topic < numTopics), "something wrong in sampling topic term!");
-			}
+			}		
 			
-			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[8] += (int)totaltime;			
-			
-			starttime = System.currentTimeMillis();
-			this.changeTopic(doc_id, ii, word, new_topic, new_path);
-			totaltime = System.currentTimeMillis() - starttime;
-			tmpstats[9] += (int)totaltime;			
+			this.changeTopic(doc_id, ii, word, new_topic, new_path);	
 		}
 		
 	}
@@ -169,8 +140,8 @@ public class TreeTopicSamplerFastEst extends TreeTopicSamplerHashD{
 		if(this.topics instanceof TreeTopicModelFastEst) {
 			TreeTopicModelFastEst tmp = (TreeTopicModelFastEst) this.topics;
 			tmp.computeSmoothingEst(this.alpha);
-		} else if (this.topics instanceof TreeTopicModelFastEstSortT) {
-			TreeTopicModelFastEstSortT tmp = (TreeTopicModelFastEstSortT) this.topics;
+		} else if (this.topics instanceof TreeTopicModelFastEstSortW) {
+			TreeTopicModelFastEstSortW tmp = (TreeTopicModelFastEstSortW) this.topics;
 			tmp.computeSmoothingEst(this.alpha);
 		}
 		

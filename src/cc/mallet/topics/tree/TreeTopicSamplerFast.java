@@ -28,7 +28,7 @@ public class TreeTopicSamplerFast extends TreeTopicSamplerHashD {
 		super(numberOfTopics, alphaSum, seed);
 
 		if (sort) {
-		    this.topics = new TreeTopicModelFastSortT(this.numTopics, this.random);
+		    this.topics = new TreeTopicModelFastSortW(this.numTopics, this.random);
 		//} else if (bubble == 1) {
 		//    this.topics = new TreeTopicModelFastSortT1(this.numTopics, this.random);
 		//} else if (bubble == 2) {

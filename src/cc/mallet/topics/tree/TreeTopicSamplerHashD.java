@@ -94,7 +94,7 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 	ArrayList<DocData> data;
 	TreeTopicModel topics;
 	TIntHashSet cons;
-	ArrayList<int[]> stats;
+	//ArrayList<int[]> stats;
 	
 	public TreeTopicSamplerHashD (int numberOfTopics, double alphaSum, int seed) {
 		this.numTopics = numberOfTopics;
@@ -111,7 +111,7 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 		this.lhood = new TDoubleArrayList();
 		this.iterTime = new TDoubleArrayList();
 		this.startIter = 0;
-		this.stats = new ArrayList<int[]> ();
+		//this.stats = new ArrayList<int[]> ();
 		
 		// notice: this.topics is not initialized in this abstract class,
 		// in each sub class, the topics variable is initialized differently.
@@ -350,8 +350,8 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 		// update parameters
 		this.topics.updateParams();
 		for (int ii = this.startIter; ii <= numIterations; ii++) {
-			int[] tmpstats = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-			this.stats.add(tmpstats);
+			//int[] tmpstats = {0, 0, 0, 0};
+			//this.stats.add(tmpstats);
 			long starttime = System.currentTimeMillis();
 			//System.out.println("Iter " + ii);
 			for (int dd = 0; dd < this.data.size(); dd++) {
@@ -474,15 +474,15 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 			}
 			Arrays.sort(wp);
 			for (int ii = 0; ii < wp.length; ii++){
+				if(ii >= numWords) {
+					break;
+				}				
 				int pp = wp[ii].wi;
 				int ww = this.topics.getWordFromPath(pp);
 				//tmp = wp[ii].p + "\t" + this.vocab.lookupObject(ww) + "\n";
 				tmp = wp[ii].p + "\t" + this.vocab.get(ww) + "\n";
 				//System.out.print(tmp);
 				out.append(tmp);
-				if(ii > numWords) {
-					break;
-				}
 			}	
 		}	
 		return out.toString();
@@ -536,10 +536,10 @@ public abstract class TreeTopicSamplerHashD implements TreeTopicSampler{
 		out.print(tmp);
 		for (int iter = 0; iter < this.lhood.size(); iter++) {
 			tmp = iter + "\t" + this.lhood.get(iter) + "\t" + this.iterTime.get(iter);
-			int[] tmpstats = this.stats.get(iter);
-			for(int ii = 0; ii < tmpstats.length; ii++) {
-				tmp += "\t" + tmpstats[ii];
-			}
+			//int[] tmpstats = this.stats.get(iter);
+			//for(int ii = 0; ii < tmpstats.length; ii++) {
+			//	tmp += "\t" + tmpstats[ii];
+			//}
 			out.println(tmp);
 		}
 		out.close();
