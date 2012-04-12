@@ -33,96 +33,96 @@ import java.io.*;
  *  @author <a href="mailto:mccallum@cs.umass.edu">Andrew McCallum</a>
  */
 
-public class Vectors2Topics {
+public class ITMVectors2Topics {
 
 	// common options in mallet
 	static CommandOption.String inputFile = new CommandOption.String
-		(Vectors2Topics.class, "input", "FILENAME", true, null,
+		(ITMVectors2Topics.class, "input", "FILENAME", true, null,
 		 "The filename from which to read the list of training instances.  Use - for stdin.  " +
 		 "The instances must be FeatureSequence or FeatureSequenceWithBigrams, not FeatureVector", null);
 
 	static CommandOption.Integer numTopics = new CommandOption.Integer
-		(Vectors2Topics.class, "num-topics", "INTEGER", true, 10,
+		(ITMVectors2Topics.class, "num-topics", "INTEGER", true, 10,
 		 "The number of topics to fit.", null);
 
 	static CommandOption.Integer numIterations = new CommandOption.Integer
-		(Vectors2Topics.class, "num-iterations", "INTEGER", true, 1000,
+		(ITMVectors2Topics.class, "num-iterations", "INTEGER", true, 1000,
 		 "The number of iterations of Gibbs sampling.", null);
 
 	static CommandOption.Integer randomSeed = new CommandOption.Integer
-		(Vectors2Topics.class, "random-seed", "INTEGER", true, 0,
+		(ITMVectors2Topics.class, "random-seed", "INTEGER", true, 0,
 		 "The random seed for the Gibbs sampler.  Default is 0, which will use the clock.", null);
 
 	static CommandOption.Integer topWords = new CommandOption.Integer
-		(Vectors2Topics.class, "num-top-words", "INTEGER", true, 20,
+		(ITMVectors2Topics.class, "num-top-words", "INTEGER", true, 20,
 		 "The number of most probable words to print for each topic after model estimation.", null);
 
 	static CommandOption.Double alpha = new CommandOption.Double
-		(Vectors2Topics.class, "alpha", "DECIMAL", true, 50.0,
+		(ITMVectors2Topics.class, "alpha", "DECIMAL", true, 50.0,
 		 "Alpha parameter: smoothing over topic distribution.",null);
 
 	////////////////////////////////////
 	// new options
 	
 	static CommandOption.Boolean useTreeLDA = new CommandOption.Boolean
-	(Vectors2Topics.class, "use-tree-lda", "true|false", false, false,
+	(ITMVectors2Topics.class, "use-tree-lda", "true|false", false, false,
 	 "Rather than using flat prior for LDA, use the tree-based prior for LDA, which models words' correlations." +
 	 "You cannot do this and also --use-ngrams or --use-PAM.", null);
 	
 	static CommandOption.String modelType = new CommandOption.String
-	(Vectors2Topics.class, "tree-model-type", "TYPENAME", true, "fast-est",
+	(ITMVectors2Topics.class, "tree-model-type", "TYPENAME", true, "fast-est",
 	 "Three possible types: naive, fast, fast-est, fast-sortD, fast-sortW, fast-sortD-sortW, fast-est-sortD, fast-est-sortW, fast-est-sortD-sortW.", null);
 
 	static CommandOption.String treeFiles = new CommandOption.String
-	(Vectors2Topics.class, "tree", "FILENAME", true, null,
+	(ITMVectors2Topics.class, "tree", "FILENAME", true, null,
 	 "The input files for tree structure.", null);
 	
 	static CommandOption.String hyperFile = new CommandOption.String
-	(Vectors2Topics.class, "tree-hyperparameters", "FILENAME", true, null,
+	(ITMVectors2Topics.class, "tree-hyperparameters", "FILENAME", true, null,
 	 "The hyperparameters for tree structure.", null);
 	
 	static CommandOption.String vocabFile = new CommandOption.String
-	(Vectors2Topics.class, "vocab", "FILENAME", true, null,
+	(ITMVectors2Topics.class, "vocab", "FILENAME", true, null,
 	 "The input vocabulary.", null);
 	
 	static CommandOption.String consFile = new CommandOption.String
-	(Vectors2Topics.class, "constraint", "FILENAME", true, null,
+	(ITMVectors2Topics.class, "constraint", "FILENAME", true, null,
 	"The input constraint file.", null);
 	
 	static CommandOption.Integer outputInteval = new CommandOption.Integer
-	(Vectors2Topics.class, "output-interval", "INTEGER", true, 20,
+	(ITMVectors2Topics.class, "output-interval", "INTEGER", true, 20,
 	 "For each interval, the result files are output to the outputFolder.", null);
 	
 	static CommandOption.String outputDir= new CommandOption.String
-	(Vectors2Topics.class, "output-dir", "FOLDERNAME", true, null,
+	(ITMVectors2Topics.class, "output-dir", "FOLDERNAME", true, null,
 	 "The output folder.", null);
 	
 	static CommandOption.Boolean resume = new CommandOption.Boolean
-	(Vectors2Topics.class, "resume", "true|false", false, false,
+	(ITMVectors2Topics.class, "resume", "true|false", false, false,
 	 "Resume from the previous output states.", null);
 	
 	static CommandOption.String resumeDir = new CommandOption.String
-	(Vectors2Topics.class, "resume-dir", "FOLDERNAME", true, null,
+	(ITMVectors2Topics.class, "resume-dir", "FOLDERNAME", true, null,
 	 "The resume folder.", null);
 	
 	static CommandOption.String clearType = new CommandOption.String
-	(Vectors2Topics.class, "clear-type", "TYPENAME", true, null,
+	(ITMVectors2Topics.class, "clear-type", "TYPENAME", true, null,
 	 "Two possible types: doc, term.", null);
 	
 	static CommandOption.Boolean genVocab = new CommandOption.Boolean
-	(Vectors2Topics.class, "generate-vocab", "true|false", false, false,
+	(ITMVectors2Topics.class, "generate-vocab", "true|false", false, false,
 	"Generate vocab after mallet preprocessing.", null);
 		
 	//static CommandOption.Boolean sortTOption = new CommandOption.Boolean
-	//(Vectors2Topics.class, "sort-topic", "true|false", false, true,
+	//(ITMVectors2Topics.class, "sort-topic", "true|false", false, true,
 	// "Sort the topic counts for each term or not.", null);
 	
 	public static void main (String[] args) throws java.io.IOException
 	{
 		// Process the command-line options
-		CommandOption.setSummary (Vectors2Topics.class,
+		CommandOption.setSummary (ITMVectors2Topics.class,
 								  "A tool for estimating, saving and printing diagnostics for topic models, such as LDA.");
-		CommandOption.process (Vectors2Topics.class, args);
+		CommandOption.process (ITMVectors2Topics.class, args);
 
 		if (useTreeLDA.value) {
 			InstanceList ilist = InstanceList.load (new File(inputFile.value));
