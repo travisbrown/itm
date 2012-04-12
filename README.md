@@ -18,15 +18,15 @@ appear together in the same topic.
 
 The project code has been Mavenified and lightly edited by Travis Brown. All
 dependencies are now managed by Maven and are not packaged with the project.
-The Java source files have also been moved out of the MALLET namespace and it
+The Java source files have also been moved out of the MALLET namespace, and it
 is no longer necessary to merge them manually with the MALLET source.
 
 Compiling
 ---------
 
 [Apache Maven](http://maven.apache.org/) is required to build this project.
-The following command will download all dependencies as necessary and compile
-the code:
+The following command will download all dependencies (as necessary) and
+compile the code:
 
     mvn compile
 
@@ -42,8 +42,8 @@ described [in the MALLET documentation](http://mallet.cs.umass.edu/import.php):
     bin/mallet import-dir --input ../../../data/synthetic/synth_word \
       --output input/synthetic-topic-input.mallet --keep-sequence
 
-Note that for this synthetic data we do not use `--remove-stopwords`, but in
-general you would want to include it here. Note also that the `input`
+Note that for this synthetic data set we do not use `--remove-stopwords`, but
+in general you would want to include it here. Note also that the `input`
 directory contains the `synthetic-topic-input.mallet` file, so you can skip
 this step and continue directly to the steps below.
 
