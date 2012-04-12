@@ -51,7 +51,7 @@ Generating vocabulary file
 --------------------------
 
     bin/mallet train-topics --input input/synthetic-topic-input.mallet \
-      --use-tree-lda true --generate-vocab true --vocab input/synthetic.voc
+      --use-tree-lda true --generate-vocab true --vocab input/synthetic/synthetic.voc
 
 Generating the tree
 -------------------
@@ -59,9 +59,9 @@ Generating the tree
 The following command requires Python 2, so you may need to change the
 `python` command if Python 3 is the default on your system.
 
-    python tree/ontology_writer_wordleaf.py --vocab=input/synthetic.voc \
+    python tree/ontology_writer_wordleaf.py --vocab=input/synthetic/synthetic.voc \
       --constraints=input/empty.cons --write_wordnet=False \
-      --write_constraints=True --wnname=input/synthetic.wn
+      --write_constraints=True --wnname=input/synthetic/synthetic.wn
 
 Note that the constraints file can be empty, in which case the output is a
 tree with symmetric priors, working as in normal LDA.
@@ -83,8 +83,8 @@ Training the tree topic model
     bin/mallet train-topics --input input/synthetic-topic-input.mallet --num-topics 5 \
       --num-iterations 300 --alpha 0.5 --random-seed 0 --output-interval 10 \
       --output-dir output/model --use-tree-lda True --tree-model-type fast \
-      --tree input/synthetic.wn --tree-hyperparameters input/tree_hyperparams \
-      --vocab input/synthetic.voc --clear-type term --constraint input/empty.cons
+      --tree input/synthetic/synthetic.wn --tree-hyperparameters input/tree_hyperparams \
+      --vocab input/synthetic/synthetic.voc --clear-type term --constraint input/empty.cons
 
 Resuming the tree topic model
 -----------------------------
@@ -92,7 +92,7 @@ Resuming the tree topic model
     bin/mallet train-topics --input input/synthetic-topic-input.mallet --num-topics 5 \
       --num-iterations 600 --alpha 0.5 --random-seed 0 --output-interval 10 \
       --output-dir output/model --use-tree-lda True \
-      --tree input/synthetic.wn --tree-hyperparameters input/tree_hyperparams \
-      --vocab input/synthetic.voc --clear-type term --constraint input/empty.cons \
+      --tree input/synthetic/synthetic.wn --tree-hyperparameters input/tree_hyperparams \
+      --vocab input/synthetic/synthetic.voc --clear-type term --constraint input/empty.cons \
       --resume true --resume-dir output/model
 
